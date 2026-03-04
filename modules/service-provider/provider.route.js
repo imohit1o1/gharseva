@@ -3,6 +3,7 @@ import { authenticate, authorizeRoles, validate, requireApproval } from "../../s
 import { ProviderController } from "./provider.controller.js"
 import { ProviderValidator } from "./provider.validator.js"
 import { RoleConstants } from "../../constants.js"
+import { ProviderBookingRouter } from "../service-booking/index.booking.js"
 
 const router = Router()
 
@@ -57,5 +58,8 @@ router.get("/:id",
     validate(ProviderValidator.getProviderByIdSchema, "params"),
     ProviderController.getProviderById
 )
+
+// Provider booking routes (auto-protects with requireApproval inside the router)
+router.use("/bookings", ProviderBookingRouter)
 
 export { router as ProviderRouter }

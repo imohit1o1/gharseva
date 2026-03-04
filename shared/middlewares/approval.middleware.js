@@ -38,6 +38,9 @@ export const requireApproval = async (req, res, next) => {
             return next(ApiErrorUtil.forbidden("Please wait for Admin approval."))
         }
 
+        // Attach profile_id so provider controllers can use it without an extra DB lookup
+        req.user.profileId = providerProfile._id
+
         next()
     } catch (error) {
         next(ApiErrorUtil.internalServer("Error checking approval status"))

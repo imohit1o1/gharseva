@@ -3,6 +3,7 @@ import { authenticate, authorizeRoles, validate } from "../../shared/middlewares
 import { UserController } from "./user.controller.js"
 import { UserValidator } from "./user.validator.js"
 import { RoleConstants } from "../../constants.js"
+import { CustomerBookingRouter } from "../service-booking/index.booking.js"
 
 const router = Router()
 
@@ -21,5 +22,8 @@ router.put("/profile",
     validate(UserValidator.updateProfileSchema),
     UserController.updateProfile
 )
+
+// Booking routes
+router.use("/bookings", CustomerBookingRouter)
 
 export { router as UserRouter }

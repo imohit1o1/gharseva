@@ -7,6 +7,7 @@ import { AuthRouter } from "./modules/auth/index.auth.js"
 import { UserRouter } from "./modules/user/index.user.js"
 import { ProviderRouter } from "./modules/service-provider/index.provider.js"
 import { CategoryRouter } from "./modules/service-category/index.service-category.js"
+import { CustomerBookingRouter, ProviderBookingRouter } from "./modules/service-booking/index.booking.js"
 import { config } from "./config/config.js"
 
 import { StatusCodes } from "http-status-codes"
@@ -42,9 +43,10 @@ app.get("/health", (req, res) => {
 // =============== API Routes =================
 app.use("/api/v1/auth", AuthRouter)
 app.use("/api/v1/users", UserRouter)
-app.use("/api/v1/providers", ProviderRouter)
-app.use("/api/v1/categories", CategoryRouter)
-
+app.use("/api/v1/service-providers", ProviderRouter)
+app.use("/api/v1/service-categories", CategoryRouter)
+app.use("/api/v1/bookings", CustomerBookingRouter)
+app.use("/api/v1/service-provider/bookings", ProviderBookingRouter)
 
 // Global error handler
 app.use(errorHandler)
