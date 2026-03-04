@@ -29,6 +29,14 @@ export const ApiErrorUtil = {
         return new ApiError(StatusCodes.BAD_REQUEST, message, errors)
     },
 
+    unauthorized(message = 'Unauthorized') {
+        return new ApiError(StatusCodes.UNAUTHORIZED, message)
+    },
+
+    forbidden(message = 'Forbidden') {
+        return new ApiError(StatusCodes.FORBIDDEN, message)
+    },
+
     notFound(message = 'Resource not found') {
         return new ApiError(StatusCodes.NOT_FOUND, message)
     },

@@ -1,0 +1,1 @@
+export { ServiceCategoryModel } from "./service-category.model.js"

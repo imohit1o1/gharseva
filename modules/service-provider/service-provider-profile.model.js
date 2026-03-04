@@ -42,12 +42,19 @@ const serviceProviderProfileSchema = new Schema(
             type: Boolean,
             default: true
         },
+        is_approved: {
+            type: Boolean,
+            default: false
+        },
         approved_by: {
             type: Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
+            index: true,
+            default: null
         },
         approved_at: {
-            type: Date
+            type: Date,
+            default: null
         }
     },
     {

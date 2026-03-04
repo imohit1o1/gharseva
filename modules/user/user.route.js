@@ -1,12 +1,14 @@
 import { Router } from "express"
-import { authenticate, validate } from "../../shared/middlewares/index.middleware.js"
+import { authenticate, authorizeRoles, validate } from "../../shared/middlewares/index.middleware.js"
 import { UserController } from "./user.controller.js"
 import { UserValidator } from "./user.validator.js"
+import { RoleConstants } from "../../constants.js"
 
 const router = Router()
 
-// All user routes are protected
+// Auntheticated and authorized customer routes
 router.use(authenticate)
+router.use(authorizeRoles(RoleConstants.CUSTOMER))
 
 router.get("/me", UserController.getMe)
 

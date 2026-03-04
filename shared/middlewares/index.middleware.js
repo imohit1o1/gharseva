@@ -1,3 +1,5 @@
 export { authenticate } from "./auth.middleware.js"
 export { errorHandler } from "./error-handler.middleware.js"
 export { validate } from "./validate.middleware.js"
+export { authorizeRoles } from "./rbac.middleware.js"
+export { requireApproval } from "./approval.middleware.js"

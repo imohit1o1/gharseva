@@ -5,8 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "node --env-file=.env --watch server.js",
-    "start": "node --env-file=.env server.js"
+    "dev": "NODE_ENV=development node --env-file=.env --watch server.js",
+    "start": "NODE_ENV=production node --env-file=.env server.js"
   },
   "keywords": [
     "gharseva",
