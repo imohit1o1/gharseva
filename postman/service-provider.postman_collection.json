@@ -1,0 +1,174 @@
+{
+    "info": {
+        "_postman_id": "19b5d2e0-f1c5-4302-a1b7-bdc123498a9d",
+        "name": "GharSeva - Service Provider Module",
+        "description": "API endpoints for the Service Provider Module in the GharSeva application.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Get Current Provider Profile",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/providers/me",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "providers",
+                        "me"
+                    ]
+                },
+                "description": "Fetches the profile of the currently authenticated Service Provider."
+            },
+            "response": []
+        },
+        {
+            "name": "Complete Provider Profile",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"first_name\": \"Amit\",\n    \"last_name\": \"Sharma\",\n    \"category_id\": \"MONGODB_OBJECT_ID_HERE\",\n    \"city\": \"Mumbai\",\n    \"area\": \"Andheri West\",\n    \"pincode\": \"400053\",\n    \"base_price\": 499\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/providers/profile",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "providers",
+                        "profile"
+                    ]
+                },
+                "description": "Completes the service provider profile with personal and professional details. Only works if the profile is not yet complete."
+            },
+            "response": []
+        },
+        {
+            "name": "Update Provider Profile",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"base_price\": 599,\n    \"area\": \"Andheri East\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/providers/profile",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "providers",
+                        "profile"
+                    ]
+                },
+                "description": "Updates existing service provider profile details. Fields are optional (partial update)."
+            },
+            "response": []
+        },
+        {
+            "name": "Toggle Availability",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{access_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"is_available\": false\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/v1/providers/profile/availability",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "providers",
+                        "profile",
+                        "availability"
+                    ]
+                },
+                "description": "Toggles the availability status of the service provider."
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "YOUR_JWT_TOKEN_HERE",
+            "type": "string"
+        }
+    ]
+}
