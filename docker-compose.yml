@@ -20,9 +20,9 @@ services:
       - "traefik.http.services.gharseva.loadbalancer.server.port=8000"
 
     networks:
-      - traefik
+      - edge
 
 networks:
 
-  traefik:
+  edge:
     external: true
