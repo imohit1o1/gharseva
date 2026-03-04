@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes"
 import { ProviderService } from "./provider.service.js"
-import { AsyncHandlerUtil, ApiResponseUtil } from "../../shared/utils/index.utils.js"
+import { AsyncHandlerUtil, ApiResponseUtil, ApiErrorUtil } from "../../shared/utils/index.utils.js"
+import { RoleConstants } from "../../constants.js"
 
 export const getMe = AsyncHandlerUtil(async (req, res) => {
     const data = await ProviderService.getMe(req.user.userId)
@@ -17,8 +18,38 @@ export const updateProfile = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "Provider profile updated successfully", data)
 })
 
+export const toggleAvailability = AsyncHandlerUtil(async (req, res) => {
+    const data = await ProviderService.toggleAvailability(req.user.userId, req.body.is_available)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Provider availability updated successfully", data)
+})
+
+
+export const getAllProviders = AsyncHandlerUtil(async (req, res) => {
+    // Only approved providers are visible to customers.
+    if (req.user.role === RoleConstants.CUSTOMER) {
+        req.query.is_approved = true
+    }
+
+    const data = await ProviderService.getAllProviders(req.query)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Service providers list fetched successfully", data)
+})
+
+export const getProviderById = AsyncHandlerUtil(async (req, res) => {
+    const data = await ProviderService.getProviderById(req.params.id)
+
+    // Only approved providers are visible to customers.
+    if (req.user.role === RoleConstants.CUSTOMER && !data.is_approved) {
+        throw ApiErrorUtil.notFound("Provider not found")
+    }
+
+    ApiResponseUtil.send(res, StatusCodes.OK, "Provider profile fetched successfully", data)
+})
+
 export const ProviderController = {
     getMe,
     completeProfile,
-    updateProfile
+    updateProfile,
+    toggleAvailability,
+    getAllProviders,
+    getProviderById
 }

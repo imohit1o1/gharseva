@@ -3,8 +3,8 @@ import { ApiError } from "../utils/index.utils.js"
 /**
  * Validation middleware
  */
-export const validate = (schema) => (req, res, next) => {
-    const result = schema.safeParse(req.body)
+export const validate = (schema, source = "body") => (req, res, next) => {
+    const result = schema.safeParse(req[source])
 
     if (!result.success) {
         console.log("Validation Error:", JSON.stringify(result.error.issues, null, 2))
@@ -15,6 +15,6 @@ export const validate = (schema) => (req, res, next) => {
         return next(new ApiError(400, "Validation failed", errors))
     }
 
-    req.body = result.data
+    req[source] = result.data
     next()
 }

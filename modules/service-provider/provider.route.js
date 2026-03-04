@@ -6,26 +6,56 @@ import { RoleConstants } from "../../constants.js"
 
 const router = Router()
 
-// =================== Aunthenticated and Authorized Service Provider routes
+// Authenticated users only
 router.use(authenticate)
-router.use(authorizeRoles(RoleConstants.SERVICE_PROVIDER))
 
-// get profile details
-router.get("/me", ProviderController.getMe)
+// Authenticated users can fetch their own profile details (SERVICE_PROVIDER only)
+router.get("/me/profile",
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    ProviderController.getMe
+)
 
-// complete onboarding profile
+// complete onboarding profile (SERVICE_PROVIDER only)
 router.post("/profile",
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
     validate(ProviderValidator.completeProfileSchema),
     ProviderController.completeProfile
 )
 
-// =================== Approved Service Provider routes ===================
-router.use(requireApproval);
-
-// update profile details
+// update profile details (approved service provider only)
 router.put("/profile",
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
     validate(ProviderValidator.updateProfileSchema),
     ProviderController.updateProfile
+)
+
+// toggle provider availability (approved service provider only)
+router.patch("/profile/availability",
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    validate(ProviderValidator.toggleAvailabilitySchema),
+    ProviderController.toggleAvailability
+)
+
+// fetch list of providers (customer and admin only)
+router.get("/",
+    authorizeRoles(
+        RoleConstants.CUSTOMER,
+        RoleConstants.ADMIN,
+    ),
+    validate(ProviderValidator.getAllProvidersSchema, "query"),
+    ProviderController.getAllProviders
+)
+
+// fetch any provider profile (customer and admin only)
+router.get("/:id",
+    authorizeRoles(
+        RoleConstants.CUSTOMER,
+        RoleConstants.ADMIN,
+    ),
+    validate(ProviderValidator.getProviderByIdSchema, "params"),
+    ProviderController.getProviderById
 )
 
 export { router as ProviderRouter }

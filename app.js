@@ -6,6 +6,7 @@ import { errorHandler } from "./shared/middlewares/index.middleware.js"
 import { AuthRouter } from "./modules/auth/index.auth.js"
 import { UserRouter } from "./modules/user/index.user.js"
 import { ProviderRouter } from "./modules/service-provider/index.provider.js"
+import { CategoryRouter } from "./modules/service-category/index.service-category.js"
 import { config } from "./config/config.js"
 
 import { StatusCodes } from "http-status-codes"
@@ -42,6 +43,7 @@ app.get("/health", (req, res) => {
 app.use("/api/v1/auth", AuthRouter)
 app.use("/api/v1/users", UserRouter)
 app.use("/api/v1/providers", ProviderRouter)
+app.use("/api/v1/categories", CategoryRouter)
 
 
 // Global error handler

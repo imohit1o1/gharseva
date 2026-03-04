@@ -1,7 +1,8 @@
 import { UserModel } from "../user/user.model.js"
 import { ServiceProviderProfileModel } from "./service-provider-profile.model.js"
-import { ServiceCategoryModel } from "../admin/index.admin.js"
+import { ServiceCategoryModel } from "../service-category/index.service-category.js"
 import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
+import { RoleConstants, PagintationConstants } from "../../constants.js"
 
 const completeProfile = async (userId, profileData) => {
     try {
@@ -124,8 +125,124 @@ const updateProfile = async (userId, profileData) => {
     }
 }
 
+const toggleAvailability = async (userId, is_available) => {
+    try {
+        const user = await UserModel.findById(userId)
+        if (!user || user.role !== RoleConstants.SERVICE_PROVIDER) {
+            throw ApiErrorUtil.notFound("Provider not found")
+        }
+
+        if (!user.isProfileComplete || !user.profile_id) {
+            throw ApiErrorUtil.badRequest("Profile must be completed before modifying availability")
+        }
+
+        const profile = await ServiceProviderProfileModel.findByIdAndUpdate(
+            user.profile_id,
+            { $set: { is_available } },
+            { new: true, runValidators: true }
+        )
+
+        if (!profile) {
+            throw ApiErrorUtil.notFound("Provider profile not found")
+        }
+
+        LoggerUtil.info(`Provider availability updated for user ${userId} to ${is_available}`)
+        return { is_available: profile.is_available }
+    } catch (error) {
+        LoggerUtil.error("Error in ProviderService.toggleAvailability", { error: error.message })
+        if (error.statusCode) throw error
+        throw ApiErrorUtil.internalServer("Error updating availability status")
+    }
+}
+
+
+const getAllProviders = async (queryFilters = {}) => {
+    try {
+        const {
+            page = PagintationConstants.PAGE,
+            limit = PagintationConstants.LIMIT,
+            city,
+            category_id,
+            is_approved,
+            is_available
+        } = queryFilters
+
+        const skip = (parseInt(page) - 1) * parseInt(limit)
+
+        const filter = {}
+        if (city) filter.city = new RegExp(city, "i") // Case insensitive search
+        if (category_id) filter.category_id = category_id
+        if (is_approved !== undefined) filter.is_approved = is_approved === "true" || is_approved === true
+        if (is_available !== undefined) filter.is_available = is_available === "true" || is_available === true
+
+        const profiles = await ServiceProviderProfileModel.find(filter)
+            .populate("user_id", "email role display_name isProfileComplete createdAt updatedAt")
+            .populate("category_id", "name")
+            .skip(skip)
+            .limit(parseInt(limit))
+            .lean()
+
+        const total = await ServiceProviderProfileModel.countDocuments(filter)
+
+        const formattedProviders = profiles.map(profile => {
+            const { user_id, ...profileData } = profile
+            return {
+                ...(user_id || {}),
+                ...profileData,
+            }
+        })
+
+        LoggerUtil.info("Providers list fetched successfully", { count: formattedProviders.length })
+
+        return {
+            providers: formattedProviders,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                total_pages: Math.ceil(total / parseInt(limit))
+            }
+        }
+    } catch (error) {
+        LoggerUtil.error("Error in ProviderService.getAllProviders", { error: error.message })
+        throw ApiErrorUtil.internalServer("Error fetching providers list")
+    }
+}
+
+
+const getProviderById = async (providerId) => {
+    try {
+        const user = await UserModel.findById(providerId)
+            .select("-password")
+            .populate("profile_id", "-_id -user_id") // get all except id and user_id relation
+            .lean()
+
+        if (!user || user.role !== RoleConstants.SERVICE_PROVIDER) {
+            throw ApiErrorUtil.notFound("Provider not found")
+        }
+
+        LoggerUtil.info(`Provider profile fetched successfully for user ${providerId}`)
+
+        const { profile_id, ...userData } = user
+        return {
+            ...userData,
+            ...(profile_id || {})
+        }
+    } catch (error) {
+        LoggerUtil.error("Error in ProviderService.getProviderById", { error: error.message })
+        if (error.statusCode) throw error
+        throw ApiErrorUtil.internalServer("Error fetching provider profile")
+    }
+}
+
+
+
+
 export const ProviderService = {
     completeProfile,
     getMe,
-    updateProfile
+    updateProfile,
+    toggleAvailability,
+    getAllProviders,
+    getProviderById
 }
