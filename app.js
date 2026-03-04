@@ -9,6 +9,8 @@ import { ProviderRouter } from "./modules/service-provider/index.provider.js"
 import { CategoryRouter } from "./modules/service-category/index.service-category.js"
 import { AdminRouter } from "./modules/admin/index.admin.js"
 import { config } from "./config/config.js"
+import { CustomerBookingRouter, ProviderBookingRouter } from "./modules/service-booking/index.booking.js"
+import { UserReviewRouter, ProviderReviewRouter } from "./modules/review/index.review.js"
 
 import { StatusCodes } from "http-status-codes"
 
@@ -47,6 +49,9 @@ app.use("/api/v1/service-providers", ProviderRouter)
 app.use("/api/v1/service-categories", CategoryRouter)
 app.use("/api/v1/bookings", CustomerBookingRouter)
 app.use("/api/v1/service-provider/bookings", ProviderBookingRouter)
+app.use("/api/v1/admin", AdminRouter)
+app.use("/api/v1/reviews/user", UserReviewRouter)
+app.use("/api/v1/reviews/provider", ProviderReviewRouter)
 
 // Global error handler
 app.use(errorHandler)

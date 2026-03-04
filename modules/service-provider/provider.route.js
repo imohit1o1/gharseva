@@ -4,6 +4,7 @@ import { ProviderController } from "./provider.controller.js"
 import { ProviderValidator } from "./provider.validator.js"
 import { RoleConstants } from "../../constants.js"
 import { ProviderBookingRouter } from "../service-booking/index.booking.js"
+import { ProviderReviewRouter } from "../review/index.review.js"
 
 const router = Router()
 
@@ -59,7 +60,10 @@ router.get("/:id",
     ProviderController.getProviderById
 )
 
-// Provider booking routes (auto-protects with requireApproval inside the router)
+// Provider booking routes
 router.use("/bookings", ProviderBookingRouter)
+
+// Provider review routes
+router.use("/reviews", ProviderReviewRouter)
 
 export { router as ProviderRouter }

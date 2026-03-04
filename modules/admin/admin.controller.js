@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes"
 import { AdminService } from "./admin.service.js"
+import { ReviewService } from "../review/review.service.js"
 import { AsyncHandlerUtil, ApiResponseUtil } from "../../shared/utils/index.utils.js"
 
 // ===================== SERVICE PROVIDERS =====================
@@ -41,6 +42,28 @@ export const getUserProfile = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "User profile fetched successfully", data)
 })
 
+// ===================== REVIEWS =====================
+
+export const getAllReviews = AsyncHandlerUtil(async (req, res) => {
+    const data = await ReviewService.getAllReviews(req.query)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Reviews fetched successfully", data)
+})
+
+export const hideReview = AsyncHandlerUtil(async (req, res) => {
+    const data = await ReviewService.hideReview(req.user.userId, req.params.reviewId)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Review hidden successfully", data)
+})
+
+export const showReview = AsyncHandlerUtil(async (req, res) => {
+    const data = await ReviewService.showReview(req.user.userId, req.params.reviewId)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Review made visible successfully", data)
+})
+
+export const deleteReview = AsyncHandlerUtil(async (req, res) => {
+    await ReviewService.deleteReview(req.params.reviewId)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Review deleted successfully", null)
+})
+
 export const AdminController = {
     getProviders,
     getProviderById,
@@ -48,5 +71,9 @@ export const AdminController = {
     rejectProvider,
     getUsers,
     getUserById,
-    getUserProfile
+    getUserProfile,
+    getAllReviews,
+    hideReview,
+    showReview,
+    deleteReview
 }

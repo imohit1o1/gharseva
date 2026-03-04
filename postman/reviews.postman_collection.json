@@ -1,0 +1,309 @@
+{
+    "info": {
+        "_postman_id": "c2d4e6f8-a0b2-4c6e-8a0c-2e4f6a8b0c2e",
+        "name": "GharSeva - Reviews Module",
+        "description": "Review endpoints for Users, Providers, and Admins.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "User",
+            "item": [
+                {
+                    "name": "Get My Reviews",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/reviews",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users",
+                                "reviews"
+                            ]
+                        },
+                        "description": "Get paginated list of reviews submitted by the authenticated customer."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Submit Review for Booking",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{user_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"rating\": 5,\n    \"review\": \"Excellent service! Very professional and on time.\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/bookings/:bookingId/review",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users",
+                                "bookings",
+                                ":bookingId",
+                                "review"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "bookingId",
+                                    "value": "REPLACE_BOOKING_ID"
+                                }
+                            ]
+                        },
+                        "description": "Submit a review for a completed booking. Booking must be COMPLETED and not yet reviewed."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Provider",
+            "item": [
+                {
+                    "name": "Get My Reviews",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{provider_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/service-providers/reviews",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "service-providers",
+                                "reviews"
+                            ]
+                        },
+                        "description": "Get paginated list of VISIBLE reviews for the authenticated service provider."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Admin",
+            "item": [
+                {
+                    "name": "Get All Reviews",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/reviews",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "reviews"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Get all reviews including hidden ones."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Hide Review",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/reviews/:reviewId/hide",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "reviews",
+                                ":reviewId",
+                                "hide"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "reviewId",
+                                    "value": "REPLACE_REVIEW_ID"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Show Review",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/reviews/:reviewId/show",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "reviews",
+                                ":reviewId",
+                                "show"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "reviewId",
+                                    "value": "REPLACE_REVIEW_ID"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Review",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/reviews/:reviewId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "reviews",
+                                ":reviewId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "reviewId",
+                                    "value": "REPLACE_REVIEW_ID"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000"
+        },
+        {
+            "key": "user_token",
+            "value": "REPLACE_WITH_USER_TOKEN"
+        },
+        {
+            "key": "provider_token",
+            "value": "REPLACE_WITH_PROVIDER_TOKEN"
+        },
+        {
+            "key": "admin_token",
+            "value": "REPLACE_WITH_ADMIN_TOKEN"
+        }
+    ]
+}

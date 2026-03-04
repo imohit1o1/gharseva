@@ -16,6 +16,8 @@ export const userIdSchema = z.object({
 export const listProvidersQuerySchema = z.object({
     page: z.string().optional().transform(val => (val ? parseInt(val) : 1)),
     limit: z.string().optional().transform(val => (val ? parseInt(val) : 10)),
+    city: z.string().trim().optional(),
+    area: z.string().trim().optional(),
     is_approved: z.enum(["true", "false"]).optional().transform(val =>
         val === undefined ? undefined : val === "true"
     )

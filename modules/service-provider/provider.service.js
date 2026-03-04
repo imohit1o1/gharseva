@@ -162,6 +162,7 @@ const getAllProviders = async (queryFilters = {}) => {
             page = PagintationConstants.PAGE,
             limit = PagintationConstants.LIMIT,
             city,
+            area,
             category_id,
             is_approved,
             is_available
@@ -170,7 +171,8 @@ const getAllProviders = async (queryFilters = {}) => {
         const skip = (parseInt(page) - 1) * parseInt(limit)
 
         const filter = {}
-        if (city) filter.city = new RegExp(city, "i") // Case insensitive search
+        if (city) filter.city = new RegExp(city, "i")
+        if (area) filter.area = new RegExp(area, "i")
         if (category_id) filter.category_id = category_id
         if (is_approved !== undefined) filter.is_approved = is_approved === "true" || is_approved === true
         if (is_available !== undefined) filter.is_available = is_available === "true" || is_available === true

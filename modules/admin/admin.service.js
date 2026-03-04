@@ -11,11 +11,15 @@ const getProviders = async (queryFilters = {}) => {
         const {
             page = PagintationConstants.PAGE,
             limit = PagintationConstants.LIMIT,
+            city,
+            area,
             is_approved
         } = queryFilters
 
         const skip = (parseInt(page) - 1) * parseInt(limit)
         const filter = {}
+        if (city) filter.city = new RegExp(city, "i")
+        if (area) filter.area = new RegExp(area, "i")
         if (is_approved !== undefined) filter.is_approved = is_approved
 
         const providers = await ServiceProviderProfileModel.find(filter)
@@ -208,3 +212,4 @@ export const AdminService = {
     getUserById,
     getUserProfile
 }
+

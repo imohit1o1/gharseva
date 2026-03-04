@@ -462,6 +462,139 @@
                     "response": []
                 }
             ]
+        },
+        {
+            "name": "Analytics",
+            "item": [
+                {
+                    "name": "Overview",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/analytics/overview",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "analytics",
+                                "overview"
+                            ]
+                        },
+                        "description": "High-level stats: total users, providers, bookings, revenue, reviews."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Booking Analytics",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/analytics/bookings",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "analytics",
+                                "bookings"
+                            ]
+                        },
+                        "description": "Bookings grouped by status and bookings per month (last 6 months)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Revenue Analytics",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/analytics/revenue",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "analytics",
+                                "revenue"
+                            ]
+                        },
+                        "description": "Total revenue and revenue per month (last 6 months, completed bookings only)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Provider Analytics",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{admin_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/admin/analytics/providers",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "admin",
+                                "analytics",
+                                "providers"
+                            ]
+                        },
+                        "description": "Provider counts (total, approved, pending, available) and top 10 by completed bookings."
+                    },
+                    "response": []
+                }
+            ]
         }
     ],
     "variable": [
