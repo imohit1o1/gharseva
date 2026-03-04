@@ -1,4 +1,4 @@
-import mongoose,{Schema} from "mongoose"
+import mongoose, { Schema } from "mongoose"
 import { RoleConstants } from "../../constants.js"
 
 const userSchema = new Schema(
@@ -20,9 +20,7 @@ const userSchema = new Schema(
         },
         password: {
             type: String,
-            required: true,
-            minlength: [8, "Password must be at least 8 characters long"],
-            maxlength: [32, "Password must be less than 32 characters long"],
+            required: true
         },
         role: {
             type: String,

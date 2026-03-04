@@ -1,4 +1,4 @@
-import { PagintationConstants } from "../../constants.js";
+import { PagintationConstants } from "../../constants.js"
 
 export const ApiResponseUtil = {
     /**
@@ -15,7 +15,7 @@ export const ApiResponseUtil = {
             message,
             data,
             timestamp: new Date().toISOString(),
-        };
+        }
 
         if (pagination) {
             response.pagination = {
@@ -23,10 +23,11 @@ export const ApiResponseUtil = {
                 limit: pagination.limit || PagintationConstants.LIMIT,
                 total: pagination.total || PagintationConstants.TOTAL,
                 totalPages: pagination.totalPages || PagintationConstants.TOTAL_PAGES,
-            };
+            }
         }
 
-        return res.status(statusCode).json(response);
+        return res.status(statusCode).json(response)
     },
-};
+}
+
 

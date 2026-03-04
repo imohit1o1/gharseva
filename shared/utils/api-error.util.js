@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes"
+
 export class ApiError extends Error {
     constructor(
         statusCode,
@@ -9,7 +11,7 @@ export class ApiError extends Error {
         this.statusCode = statusCode
         this.data = null
         this.message = message
-        this.success = false;
+        this.success = false
         this.errors = errors
 
         if (stack) {
@@ -24,22 +26,22 @@ export class ApiError extends Error {
 
 export const ApiErrorUtil = {
     badRequest(message = 'Bad request', errors = null) {
-        return new ApiError(400, message, errors);
+        return new ApiError(StatusCodes.BAD_REQUEST, message, errors)
     },
 
     notFound(message = 'Resource not found') {
-        return new ApiError(404, message);
+        return new ApiError(StatusCodes.NOT_FOUND, message)
     },
 
     requestTimeout(message = 'Request timeout') {
-        return new ApiError(408, message);
+        return new ApiError(StatusCodes.REQUEST_TIMEOUT, message)
     },
 
     conflict(message = 'Resource conflict') {
-        return new ApiError(409, message);
+        return new ApiError(StatusCodes.CONFLICT, message)
     },
 
     internalServer(message = 'Internal server error') {
-        return new ApiError(500, message);
+        return new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, message)
     },
-};
+}
