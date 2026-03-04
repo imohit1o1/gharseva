@@ -20,6 +20,5 @@ RUN corepack enable
 
 COPY --from=builder /app /app
 ENV NODE_ENV=production
-EXPOSE 8000
 
 CMD ["pnpm", "start"]
