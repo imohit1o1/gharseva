@@ -21,4 +21,4 @@ router.post("/refresh-token",
     AuthController.refreshToken
 )
 
-export { router as authRouter }
+export { router as AuthRouter }

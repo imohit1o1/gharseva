@@ -5,10 +5,8 @@ const userSchema = new Schema(
     {
         display_name: {
             type: String,
-            required: true,
             trim: true,
-            minlength: [2, "Display name must be at least 2 characters long"],
-            maxlength: [100, "Display name must be less than 100 characters long"],
+            default: ""
         },
         email: {
             type: String,
@@ -34,7 +32,8 @@ const userSchema = new Schema(
         },
         profile_id: {
             type: Schema.Types.ObjectId,
-            ref: "UserProfile"
+            ref: "UserProfile",
+            default: null
         }
     },
     {

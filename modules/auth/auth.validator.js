@@ -5,12 +5,6 @@ import { RoleConstants } from "../../constants.js"
  * Register schema
  */
 export const registerSchema = z.object({
-    display_name: z
-        .string({ required_error: "Display name is required" })
-        .trim()
-        .min(2, "Display name must be at least 2 characters")
-        .max(100, "Display name must be less than 100 characters"),
-
     email: z
         .string({ required_error: "Email is required" })
         .trim()

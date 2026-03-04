@@ -3,7 +3,8 @@ import helmet from "helmet"
 import morgan from "morgan"
 import cors from "cors"
 import { errorHandler } from "./shared/middlewares/index.middleware.js"
-import { authRouter } from "./modules/auth/index.auth.js"
+import { AuthRouter } from "./modules/auth/index.auth.js"
+import { UserRouter } from "./modules/user/index.user.js"
 import { config } from "./config/config.js"
 
 import { StatusCodes } from "http-status-codes"
@@ -26,10 +27,6 @@ app.get("/", (req, res) => {
         version: "v1",
         environment: config.app.env,
         timestamp: new Date().toISOString(),
-        endpoints: {
-            health: "/health",
-            auth: "/api/v1/auth"
-        }
     })
 })
 
@@ -41,7 +38,9 @@ app.get("/health", (req, res) => {
 
 
 // =============== API Routes =================
-app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/auth", AuthRouter)
+app.use("/api/v1/users", UserRouter)
+
 
 // Global error handler
 app.use(errorHandler)

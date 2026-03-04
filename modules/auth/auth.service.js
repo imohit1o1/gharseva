@@ -5,7 +5,7 @@ import { ApiErrorUtil, JwtUtil, LoggerUtil } from "../../shared/utils/index.util
 // register the user
 const register = async (data) => {
     try {
-        const { display_name, email, password, role } = data
+        const { email, password, role } = data
         const existingUser = await UserModel.findOne({ email })
         if (existingUser) {
             throw ApiErrorUtil.conflict("An account with this email already exists")
@@ -14,7 +14,6 @@ const register = async (data) => {
         const hashedPassword = await bcrypt.hash(password, 12)
 
         const user = await UserModel.create({
-            display_name,
             email,
             password: hashedPassword,
             role
