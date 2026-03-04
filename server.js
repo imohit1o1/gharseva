@@ -1,11 +1,26 @@
-import dotenv from "dotenv";
-import express from "express";
+import { config } from "./config/index.config.js"
+import { connectDB } from "./db/index.db.js"
+import { app } from "./app.js"
+import { LoggerUtil } from "./shared/utils/index.utils.js"
 
-dotenv.config("./.env");
+async function serverStart() {
+    const port = config.app.port;
 
-const app = express();
-const port = process.env.PORT || 8001;
+    try {
+        await connectDB.connect();
 
-app.listen(PORT => {
-    console.log(`App is listening on the port ${port}`)
-})
+        app.listen(port, () => {
+            LoggerUtil.info(`Server running on port ${port}`, {
+                env: config.app.env
+            })
+        })
+    } catch (error) {
+        LoggerUtil.error("Failed to start server", {
+            env: config.app.env,
+            error: error.message
+        })
+        process.exit(1)
+    }
+}
+
+serverStart()
