@@ -5,6 +5,7 @@ import { ProviderValidator } from "./provider.validator.js"
 import { RoleConstants } from "../../constants.js"
 import { ProviderBookingRouter } from "../service-booking/index.booking.js"
 import { ProviderReviewRouter } from "../review/index.review.js"
+import { ProviderAnalyticsController } from "./provider-analytics.controller.js"
 
 const router = Router()
 
@@ -65,5 +66,12 @@ router.use("/bookings", ProviderBookingRouter)
 
 // Provider review routes
 router.use("/reviews", ProviderReviewRouter)
+
+// Provider analytics (requireApproval attaches profileId)
+router.get("/analytics",
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    ProviderAnalyticsController.getProviderAnalytics
+)
 
 export { router as ProviderRouter }

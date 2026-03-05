@@ -18,7 +18,13 @@ const app = express()
 
 // middleware
 app.use(helmet())
-app.use(cors())
+app.use(cors({
+    origin: process.env.CORS_ORIGINS?.split(","),
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+})
+)
 app.use(morgan(config.app.env === "development" ? "dev" : "combined"))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
