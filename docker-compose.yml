@@ -12,11 +12,13 @@ services:
       - .env
 
     labels:
-
       - "traefik.enable=true"
+
       - "traefik.http.routers.gharseva.rule=Host(`api.gharseva.imohit1o1.online`)"
-      - "traefik.http.routers.gharseva.entrypoints=websecure"
+      - "traefik.http.routers.gharseva.entrypoints=web,websecure"
+
       - "traefik.http.routers.gharseva.tls.certresolver=letsencrypt"
+
       - "traefik.http.services.gharseva.loadbalancer.server.port=8000"
 
     networks:
