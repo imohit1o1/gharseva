@@ -1,11 +1,14 @@
-import bcrypt from "bcryptjs"
 import { UserModel } from "../user/user.model.js"
+import { ServiceProviderProfileModel } from "../service-provider/service-provider-profile.model.js"
+import { ServiceCategoryModel } from "../service-category/service-category.model.js"
 import { ApiErrorUtil, JwtUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
+import { RoleConstants } from "../../constants.js"
+import bcrypt from "bcryptjs"
 
 // register the user
-const register = async (data) => {
+const register = async (data, role = RoleConstants.CUSTOMER) => {
     try {
-        const { email, password, role } = data
+        const { email, password } = data
         const existingUser = await UserModel.findOne({ email })
         if (existingUser) {
             throw ApiErrorUtil.conflict("An account with this email already exists")
@@ -32,6 +35,65 @@ const register = async (data) => {
         LoggerUtil.error("Error in AuthService.register", { error: error.message })
         if (error.statusCode) throw error
         throw ApiErrorUtil.internalServer("Error registering user")
+    }
+}
+
+// register the provider
+const registerProvider = async (data) => {
+    try {
+        const {
+            email, password, first_name, last_name, category_id, city, area, pincode, base_price, experience, avatar, description
+        } = data
+
+        const existingUser = await UserModel.findOne({ email })
+        if (existingUser) {
+            throw ApiErrorUtil.conflict("An account with this email already exists")
+        }
+
+        // verify category
+        const category = await ServiceCategoryModel.findById(category_id)
+        if (!category) {
+            throw ApiErrorUtil.notFound("Service category not found")
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12)
+
+        const user = await UserModel.create({
+            email,
+            password: hashedPassword,
+            role: RoleConstants.SERVICE_PROVIDER,
+            display_name: `${first_name} ${last_name}`,
+            isProfileComplete: true
+        })
+
+        const providerProfile = await ServiceProviderProfileModel.create({
+            user_id: user._id,
+            category_id,
+            city,
+            area,
+            pincode,
+            base_price,
+            experience,
+            avatar,
+            description
+        })
+
+        user.profile_id = providerProfile._id
+        await user.save()
+
+        const token = JwtUtil.generateToken({
+            userId: user._id,
+            role: user.role
+        })
+
+        const userObj = user.toObject()
+        delete userObj.password
+
+        return { user: userObj, profile: providerProfile, token }
+    } catch (error) {
+        LoggerUtil.error("Error in AuthService.registerProvider", { error: error.message })
+        if (error.statusCode) throw error
+        throw ApiErrorUtil.internalServer("Error registering provider")
     }
 }
 
@@ -86,4 +148,4 @@ const refreshToken = async (userId) => {
 }
 
 
-export const AuthService = { register, login, refreshToken }
+export const AuthService = { register, registerProvider, login, refreshToken }

@@ -7,8 +7,12 @@ const router = Router()
 
 // Public routes
 router.post("/register",
-    validate(AuthValidator.registerSchema),
+    validate(AuthValidator.customerRegisterSchema),
     AuthController.register
+)
+router.post("/register/service-provider",
+    validate(AuthValidator.providerRegisterSchema),
+    AuthController.registerProvider
 )
 router.post("/login",
     validate(AuthValidator.loginSchema),

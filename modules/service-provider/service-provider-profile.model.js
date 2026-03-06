@@ -38,9 +38,28 @@ const serviceProviderProfileSchema = new Schema(
             required: true,
             min: 0
         },
+        experience: {
+            type: Number,
+            required: [true, "Experience is required"],
+            min: [0, "Experience cannot be negative"],
+        },
+        avatar: {
+            type: String,
+            required: [true, "Avatar is required"]
+        },
+        description: {
+            type: String,
+            required: [true, "Description is required"],
+            trim: true,
+            maxlength: [500, "Description must be less than 500 characters long"]
+        },
         is_available: {
             type: Boolean,
             default: true
+        },
+        is_featured: {
+            type: Boolean,
+            default: false
         },
         is_approved: {
             type: Boolean,

@@ -49,9 +49,15 @@ const bookingSchema = new Schema(
             type: Date,
             required: true
         },
-        image_url: {
+        before_image: {
             type: String,
-            trim: true
+            trim: true,
+            default: null
+        },
+        after_image: {
+            type: String,
+            trim: true,
+            default: null
         },
         price: {
             type: Number,

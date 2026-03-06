@@ -42,7 +42,11 @@ const userProfileSchema = new Schema(
             trim: true,
             minlength: [4, "Pincode must be at least 4 characters long"],
             maxlength: [10, "Pincode must be less than 10 characters long"],
-        }
+        },
+        avatar: {
+            type: String,
+            default: null
+        },
     },
     {
         timestamps: true

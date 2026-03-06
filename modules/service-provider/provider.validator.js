@@ -38,7 +38,21 @@ export const completeProfileSchema = z.object({
 
     base_price: z
         .number({ required_error: "Base price is required" })
-        .min(0, "Base price cannot be negative")
+        .min(0, "Base price cannot be negative"),
+
+    experience: z
+        .number({ required_error: "Experience is required" })
+        .min(0, "Experience cannot be negative"),
+
+    avatar: z
+        .string({ required_error: "Avatar is required" })
+        .url("Please provide a valid avatar URL"),
+
+    description: z
+        .string({ required_error: "Description is required" })
+        .trim()
+        .min(20, "Description must be at least 20 characters")
+        .max(500, "Description must be less than 500 characters")
 })
 
 export const updateProfileSchema = completeProfileSchema.partial()

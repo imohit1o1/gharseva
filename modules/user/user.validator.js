@@ -29,7 +29,12 @@ export const completeProfileSchema = z.object({
         .string({ required_error: "Pincode is required" })
         .trim()
         .min(4, "Pincode must be at least 4 characters")
-        .max(10, "Pincode must be less than 10 characters")
+        .max(10, "Pincode must be less than 10 characters"),
+
+    avatar: z
+        .string()
+        .url("Please provide a valid avatar URL")
+        .optional()
 })
 
 export const updateProfileSchema = completeProfileSchema.partial()

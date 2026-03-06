@@ -11,8 +11,10 @@ import { AdminRouter } from "./modules/admin/index.admin.js"
 import { config } from "./config/config.js"
 import { CustomerBookingRouter, ProviderBookingRouter } from "./modules/service-booking/index.booking.js"
 import { UserReviewRouter, ProviderReviewRouter } from "./modules/review/index.review.js"
+import { UploadRouter } from "./modules/upload/upload.route.js"
 
 import { StatusCodes } from "http-status-codes"
+import { ApiResponseUtil } from "./shared/utils/index.utils.js"
 
 const app = express()
 
@@ -32,19 +34,31 @@ app.use(express.urlencoded({ extended: true }))
 // =============== Routes =================
 // home route
 app.get("/", (req, res) => {
-    res.status(StatusCodes.OK).json({
+    return ApiResponseUtil.send(res, StatusCodes.OK, "Welcome to GharSeva API", {
         service: "GharSeva Backend API",
-        status: "running",
         version: "v1",
         environment: config.app.env,
-        timestamp: new Date().toISOString(),
     })
 })
 
 
 // health check route
 app.get("/health", (req, res) => {
-    res.status(StatusCodes.OK).json({ status: "ok" })
+    const healthData = {
+        uptime: `${Math.floor(process.uptime())} seconds`,
+        memoryUsage: {
+            rss: `${Math.round(process.memoryUsage().rss / 1024 / 1024)} MB`,
+            heapTotal: `${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)} MB`,
+            heapUsed: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB`,
+        }
+    }
+
+    return ApiResponseUtil.send(
+        res,
+        StatusCodes.OK,
+        "System is healthy",
+        healthData
+    )
 })
 
 
@@ -58,6 +72,7 @@ app.use("/api/v1/service-provider/bookings", ProviderBookingRouter)
 app.use("/api/v1/admin", AdminRouter)
 app.use("/api/v1/reviews/user", UserReviewRouter)
 app.use("/api/v1/reviews/provider", ProviderReviewRouter)
+app.use("/api/v1/upload", UploadRouter)
 
 // Global error handler
 app.use(errorHandler)
