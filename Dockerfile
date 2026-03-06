@@ -1,24 +1,30 @@
-# Builder stage
-FROM node:22-alpine AS builder
+# ---------- Builder ----------
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 RUN corepack enable
+
 COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-
-# Runner stage
+# ---------- Production ----------
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
 RUN corepack enable
 
-COPY --from=builder /app /app
 ENV NODE_ENV=production
+
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install --prod --frozen-lockfile
+
+COPY --from=builder /app ./
+
 
 CMD ["pnpm", "start"]
