@@ -4,6 +4,8 @@ import { ServiceCategoryModel } from "../service-category/service-category.model
 import { ApiErrorUtil, JwtUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
 import { RoleConstants } from "../../constants.js"
 import bcrypt from "bcryptjs"
+import { UserService } from "../user/user.service.js"
+import { ProviderService } from "../service-provider/provider.service.js"
 
 // register the user
 const register = async (data, role = RoleConstants.CUSTOMER) => {
@@ -112,8 +114,12 @@ const login = async ({ email, password }) => {
             role: user.role
         })
 
-        const userObj = user.toObject()
-        delete userObj.password
+        let userObj;
+        if (user.role === RoleConstants.SERVICE_PROVIDER) {
+            userObj = await ProviderService.getMe(user._id);
+        } else {
+            userObj = await UserService.getMe(user._id);
+        }
 
         return { user: userObj, token }
     } catch (error) {

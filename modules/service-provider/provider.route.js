@@ -13,7 +13,7 @@ const router = Router()
 router.use(authenticate)
 
 // Authenticated users can fetch their own profile details (SERVICE_PROVIDER only)
-router.get("/me/profile",
+router.get("/profile",
     authorizeRoles(RoleConstants.SERVICE_PROVIDER),
     ProviderController.getMe
 )
@@ -41,25 +41,6 @@ router.patch("/profile/availability",
     ProviderController.toggleAvailability
 )
 
-// fetch list of providers (customer and admin only)
-router.get("/",
-    authorizeRoles(
-        RoleConstants.CUSTOMER,
-        RoleConstants.ADMIN,
-    ),
-    validate(ProviderValidator.getAllProvidersSchema, "query"),
-    ProviderController.getAllProviders
-)
-
-// fetch any provider profile (customer and admin only)
-router.get("/:id",
-    authorizeRoles(
-        RoleConstants.CUSTOMER,
-        RoleConstants.ADMIN,
-    ),
-    validate(ProviderValidator.getProviderByIdSchema, "params"),
-    ProviderController.getProviderById
-)
 
 // Provider booking routes
 router.use("/bookings", ProviderBookingRouter)
@@ -74,4 +55,20 @@ router.get("/analytics",
     ProviderAnalyticsController.getProviderAnalytics
 )
 
+
+
+
+// fetch list of providers (customer only)
+router.get("/",
+    authorizeRoles(RoleConstants.CUSTOMER),
+    validate(ProviderValidator.getAllProvidersSchema, "query"),
+    ProviderController.getAllProviders
+)
+
+// fetch any provider profile (customer only)
+router.get("/:id",
+    authorizeRoles(RoleConstants.CUSTOMER),
+    validate(ProviderValidator.getProviderByIdSchema, "params"),
+    ProviderController.getProviderById
+)
 export { router as ProviderRouter }

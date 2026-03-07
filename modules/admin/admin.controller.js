@@ -25,6 +25,16 @@ export const rejectProvider = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "Service provider rejected successfully", data)
 })
 
+export const updateProvider = AsyncHandlerUtil(async (req, res) => {
+    const data = await AdminService.updateProvider(req.params.providerId, req.body)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Service provider updated successfully", data)
+})
+
+export const deleteProvider = AsyncHandlerUtil(async (req, res) => {
+    const data = await AdminService.deleteProvider(req.params.providerId)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Service provider deleted successfully", data)
+})
+
 // ===================== USERS =====================
 
 export const getUsers = AsyncHandlerUtil(async (req, res) => {
@@ -74,6 +84,8 @@ export const AdminController = {
     getProviderById,
     approveProvider,
     rejectProvider,
+    updateProvider,
+    deleteProvider,
     getUsers,
     getUserById,
     updateUser,

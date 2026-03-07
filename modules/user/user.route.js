@@ -13,14 +13,14 @@ const router = Router()
 router.use(authenticate)
 router.use(authorizeRoles(RoleConstants.CUSTOMER))
 
-router.get("/me", UserController.getMe)
+router.get("/profile", UserController.getMe)
 
-router.post("/profile",
+router.post("/profile/complete",
     validate(UserValidator.completeProfileSchema),
     UserController.completeProfile
 )
 
-router.put("/profile",
+router.put("/profile/update",
     validate(UserValidator.updateProfileSchema),
     UserController.updateProfile
 )

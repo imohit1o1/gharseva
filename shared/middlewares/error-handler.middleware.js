@@ -6,9 +6,20 @@ export const errorHandler = (err, req, res, next) => {
         return next(err)
     }
 
-    const statusCode = err instanceof ApiError ? err.statusCode : 500
-    const message = err instanceof ApiError ? err.message : "Internal server error"
-    const errors = err instanceof ApiError ? err.errors : []
+    let statusCode = err instanceof ApiError ? err.statusCode : 500
+    let message = err instanceof ApiError ? err.message : "Internal server error"
+    let errors = err instanceof ApiError ? err.errors : []
+
+    // Multer Error Handling
+    if (err.name === 'MulterError') {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            statusCode = 413 // Payload Too Large
+            message = "File is too large. Max allowed size is 5MB"
+        } else {
+            statusCode = 400
+            message = `Upload error: ${err.message}`
+        }
+    }
 
     if (statusCode >= 500) {
         LoggerUtil.error(`[${req.method}] ${req.originalUrl} → ${err.message}`, {

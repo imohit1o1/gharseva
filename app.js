@@ -65,7 +65,7 @@ app.get("/health", (req, res) => {
 // =============== API Routes =================
 app.use("/api/v1/auth", AuthRouter)
 app.use("/api/v1/users", UserRouter)
-app.use("/api/v1/service-providers", ProviderRouter)
+app.use("/api/v1/service-provider", ProviderRouter)
 app.use("/api/v1/service-categories", CategoryRouter)
 app.use("/api/v1/bookings", CustomerBookingRouter)
 app.use("/api/v1/service-provider/bookings", ProviderBookingRouter)

@@ -3,6 +3,7 @@ import { ServiceProviderProfileModel } from "./service-provider-profile.model.js
 import { ServiceCategoryModel } from "../service-category/index.service-category.js"
 import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
 import { RoleConstants, PagintationConstants } from "../../constants.js"
+import mongoose from "mongoose"
 
 const completeProfile = async (userId, profileData) => {
     try {
@@ -50,24 +51,62 @@ const completeProfile = async (userId, profileData) => {
 
 const getMe = async (userId) => {
     try {
-        const user = await UserModel.findById(userId)
-            .select("-password")
-            .lean()
+        const user = await UserModel.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(userId) }
+            },
+            {
+                $lookup: {
+                    from: "serviceproviderprofiles",
+                    localField: "_id",
+                    foreignField: "user_id",
+                    as: "profile"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$profile",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: [{ $ifNull: ["$profile", {}] }, "$$ROOT"]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "servicecategories",
+                    localField: "category_id",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$category",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    password: 0,
+                    profile: 0,
+                    user_id: 0,
+                    __v: 0
+                }
+            }
+        ]);
 
-        if (!user) {
+        if (!user || user.length === 0) {
             throw ApiErrorUtil.notFound("User not found")
         }
 
-        const profile = await ServiceProviderProfileModel.findOne({ user_id: userId })
-            .select("-_id -user_id")
-            .lean()
-
         LoggerUtil.info(`Provider profile fetched successfully for user ${userId}`, { userId })
 
-        return {
-            ...user,
-            ...(profile || {})
-        }
+        return user[0]
     } catch (error) {
         LoggerUtil.error("Error in ProviderService.getMe", { error: error.message })
         if (error.statusCode) throw error
@@ -207,24 +246,65 @@ const getAllProviders = async (queryFilters = {}) => {
 
 const getProviderById = async (providerId) => {
     try {
-        const user = await UserModel.findById(providerId)
-            .select("-password")
-            .lean()
+        const user = await UserModel.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(providerId),
+                    role: RoleConstants.SERVICE_PROVIDER
+                }
+            },
+            {
+                $lookup: {
+                    from: "serviceproviderprofiles",
+                    localField: "_id",
+                    foreignField: "user_id",
+                    as: "profile"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$profile",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: [{ $ifNull: ["$profile", {}] }, "$$ROOT"]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "servicecategories",
+                    localField: "category_id",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$category",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    password: 0,
+                    profile: 0,
+                    user_id: 0,
+                    __v: 0
+                }
+            }
+        ]);
 
-        if (!user || user.role !== RoleConstants.SERVICE_PROVIDER) {
+        if (!user || user.length === 0) {
             throw ApiErrorUtil.notFound("Provider not found")
         }
 
-        const profile = await ServiceProviderProfileModel.findOne({ user_id: providerId })
-            .select("-_id -user_id")
-            .lean()
-
         LoggerUtil.info(`Provider profile fetched successfully for user ${providerId}`)
 
-        return {
-            ...user,
-            ...(profile || {})
-        }
+        return user[0]
     } catch (error) {
         LoggerUtil.error("Error in ProviderService.getProviderById", { error: error.message })
         if (error.statusCode) throw error

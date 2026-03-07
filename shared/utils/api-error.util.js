@@ -52,4 +52,8 @@ export const ApiErrorUtil = {
     internalServer(message = 'Internal server error') {
         return new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, message)
     },
+
+    payloadTooLarge(message = 'Payload too large') {
+        return new ApiError(StatusCodes.REQUEST_TOO_LONG, message)
+    }
 }

@@ -122,6 +122,81 @@ const rejectProvider = async (adminId, providerId) => {
     }
 }
 
+const updateProvider = async (providerProfileId, updateData) => {
+    try {
+        const profile = await ServiceProviderProfileModel.findById(providerProfileId)
+        if (!profile) {
+            throw ApiErrorUtil.notFound("Service provider profile not found")
+        }
+
+        const user = await UserModel.findById(profile.user_id)
+        if (!user) {
+            throw ApiErrorUtil.notFound("User associated with provider not found")
+        }
+
+        // Update User fields if provided
+        const { firstName, lastName, display_name, email } = updateData
+        if (display_name) user.display_name = display_name
+        if (email) user.email = email
+        if (firstName || lastName) {
+            const currentNames = (user.display_name || "").split(" ")
+            const currentFirstName = currentNames[0] || ""
+            const currentLastName = currentNames.slice(1).join(" ") || ""
+            user.display_name = `${firstName || currentFirstName} ${lastName || currentLastName}`
+        }
+        await user.save()
+
+        // Update Profile fields
+        const profileFields = [
+            "category_id",
+            "city",
+            "area",
+            "pincode",
+            "base_price",
+            "experience",
+            "avatar",
+            "description",
+            "is_available",
+            "is_featured",
+            "is_approved"
+        ]
+        profileFields.forEach(field => {
+            if (updateData[field] !== undefined) {
+                profile[field] = updateData[field]
+            }
+        })
+
+        await profile.save()
+
+        return await getProviderById(providerProfileId)
+    } catch (error) {
+        LoggerUtil.error("Error in AdminService.updateProvider", { error: error.message })
+        if (error.statusCode) throw error
+        throw ApiErrorUtil.internalServer("Error updating service provider")
+    }
+}
+
+const deleteProvider = async (providerProfileId) => {
+    try {
+        const profile = await ServiceProviderProfileModel.findById(providerProfileId)
+        if (!profile) {
+            throw ApiErrorUtil.notFound("Service provider profile not found")
+        }
+
+        const userId = profile.user_id
+
+        await ServiceProviderProfileModel.findByIdAndDelete(providerProfileId)
+        await UserModel.findByIdAndDelete(userId)
+
+        LoggerUtil.info(`Provider ${providerProfileId} and user ${userId} deleted by admin`)
+        return { message: "Service provider and associated user account deleted successfully" }
+    } catch (error) {
+        LoggerUtil.error("Error in AdminService.deleteProvider", { error: error.message })
+        if (error.statusCode) throw error
+        throw ApiErrorUtil.internalServer("Error deleting service provider")
+    }
+}
+
 // ===================== USER MANAGEMENT =====================
 
 const getUsers = async (queryFilters = {}) => {
@@ -284,8 +359,9 @@ const deleteUser = async (userId) => {
 
         await UserModel.findByIdAndDelete(userId)
         await UserProfileModel.findOneAndDelete({ user_id: userId })
+        await ServiceProviderProfileModel.findOneAndDelete({ user_id: userId })
 
-        return { message: "User and associated profile deleted successfully" }
+        return { message: "User and associated profiles deleted successfully" }
     } catch (error) {
         LoggerUtil.error("Error in AdminService.deleteUser", { error: error.message })
         if (error.statusCode) throw error
@@ -298,6 +374,8 @@ export const AdminService = {
     getProviderById,
     approveProvider,
     rejectProvider,
+    updateProvider,
+    deleteProvider,
     getUsers,
     getUserById,
     updateUser,
