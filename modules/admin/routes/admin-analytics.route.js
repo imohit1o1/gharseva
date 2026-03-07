@@ -7,6 +7,7 @@ const router = Router()
 router.get("/overview", AnalyticsController.getOverview)
 router.get("/bookings", AnalyticsController.getBookingAnalytics)
 router.get("/revenue", AnalyticsController.getRevenueAnalytics)
-router.get("/providers", AnalyticsController.getProviderAnalytics)
+router.get("/service-providers", AnalyticsController.getProviderAnalytics)
+router.get("/users", AnalyticsController.getUserAnalytics)
 
 export { router as AdminAnalyticsRouter }

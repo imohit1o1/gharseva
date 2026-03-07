@@ -4,7 +4,6 @@ export const authenticate = (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 
-
         if (!authHeader) {
             return next(new ApiError(401, "Authorization header missing"));
         };

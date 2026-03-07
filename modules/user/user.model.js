@@ -29,11 +29,6 @@ const userSchema = new Schema(
         isProfileComplete: {
             type: Boolean,
             default: false
-        },
-        profile_id: {
-            type: Schema.Types.ObjectId,
-            ref: "UserProfile",
-            default: null
         }
     },
     {

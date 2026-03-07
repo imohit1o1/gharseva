@@ -7,6 +7,7 @@ const router = Router()
 
 router.get("/", validate(AdminValidator.listUsersQuerySchema, "query"), AdminController.getUsers)
 router.get("/:userId", validate(AdminValidator.userIdSchema, "params"), AdminController.getUserById)
-router.get("/:userId/profile", validate(AdminValidator.userIdSchema, "params"), AdminController.getUserProfile)
+router.put("/:userId", validate(AdminValidator.userIdSchema, "params"), validate(AdminValidator.updateUserSchema, "body"), AdminController.updateUser)
+router.delete("/:userId", validate(AdminValidator.userIdSchema, "params"), AdminController.deleteUser)
 
 export { router as AdminUserRouter }

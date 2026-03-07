@@ -30,6 +30,6 @@ const uploadImage = AsyncHandlerUtil(async (req, res) => {
 
 const router = Router()
 
-router.post("/image", authenticate, upload.single("image"), uploadImage)
+router.post("/image", upload.single("image"), uploadImage)
 
 export { router as UploadRouter }

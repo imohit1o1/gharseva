@@ -128,18 +128,60 @@ const getUsers = async (queryFilters = {}) => {
     try {
         const {
             page = PagintationConstants.PAGE,
-            limit = PagintationConstants.LIMIT
+            limit = PagintationConstants.LIMIT,
+            isProfileComplete
         } = queryFilters
 
         const skip = (parseInt(page) - 1) * parseInt(limit)
-        const filter = { role: RoleConstants.CUSTOMER }
 
-        const users = await UserModel.find(filter)
-            .select("-password")
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(parseInt(limit))
-            .lean()
+        const filter = { role: RoleConstants.CUSTOMER }
+        if (isProfileComplete !== undefined) {
+            filter.isProfileComplete = isProfileComplete
+        }
+
+        const users = await UserModel.aggregate([
+            {
+                $match: filter
+            },
+            {
+                $lookup: {
+                    from: "userprofiles",
+                    localField: "_id",
+                    foreignField: "user_id",
+                    as: "profile"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$profile",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $skip: skip
+            },
+            {
+                $limit: parseInt(limit)
+            },
+            {
+                $project: {
+                    _id: 1,
+                    display_name: 1,
+                    email: 1,
+                    role: 1,
+                    createdAt: 1,
+                    profileComplete: "$isProfileComplete",
+                    firstName: "$profile.first_name",
+                    lastName: "$profile.last_name",
+                    city: "$profile.city",
+                    area: "$profile.area",
+                    pincode: "$profile.pincode"
+                }
+            }
+        ])
 
         const total = await UserModel.countDocuments(filter)
 
@@ -160,15 +202,24 @@ const getUsers = async (queryFilters = {}) => {
 
 const getUserById = async (userId) => {
     try {
-        const user = await UserModel.findOne({ _id: userId, role: RoleConstants.CUSTOMER })
-            .select("-password")
-            .lean()
+        const user = await UserModel.findById(userId).select("-password").lean()
 
         if (!user) {
             throw ApiErrorUtil.notFound("User not found")
         }
 
-        return user
+        const profile = await UserProfileModel.findOne({ user_id: userId }).lean()
+
+        return {
+            ...user,
+            profileComplete: user.isProfileComplete,
+            firstName: profile?.first_name || null,
+            lastName: profile?.last_name || null,
+            city: profile?.city || null,
+            area: profile?.area || null,
+            pincode: profile?.pincode || null,
+            avatar: profile?.avatar || null
+        }
     } catch (error) {
         LoggerUtil.error("Error in AdminService.getUserById", { error: error.message })
         if (error.statusCode) throw error
@@ -176,30 +227,69 @@ const getUserById = async (userId) => {
     }
 }
 
-const getUserProfile = async (userId) => {
+const updateUser = async (userId, updateData) => {
     try {
-        const user = await UserModel.findOne({ _id: userId, role: RoleConstants.CUSTOMER })
-            .select("_id profile_id isProfileComplete display_name email")
-            .lean()
-
+        const user = await UserModel.findById(userId)
         if (!user) {
             throw ApiErrorUtil.notFound("User not found")
         }
 
-        if (!user.isProfileComplete || !user.profile_id) {
-            throw ApiErrorUtil.notFound("User profile not yet completed")
+        // Update User Model
+        const userFields = ["display_name", "email", "isProfileComplete"]
+        userFields.forEach(field => {
+            if (updateData[field] !== undefined) {
+                user[field] = updateData[field]
+            }
+        })
+        await user.save()
+
+        // Update Profile Model
+        const profileUpdate = {}
+        const profileFieldsMap = {
+            firstName: "first_name",
+            lastName: "last_name",
+            city: "city",
+            area: "area",
+            pincode: "pincode"
         }
 
-        const profile = await UserProfileModel.findById(user.profile_id).lean()
-        if (!profile) {
-            throw ApiErrorUtil.notFound("User profile not found")
+        Object.keys(profileFieldsMap).forEach(key => {
+            if (updateData[key] !== undefined) {
+                profileUpdate[profileFieldsMap[key]] = updateData[key]
+            }
+        })
+
+        if (Object.keys(profileUpdate).length > 0) {
+            await UserProfileModel.findOneAndUpdate(
+                { user_id: userId },
+                { $set: profileUpdate },
+                { upsert: true, new: true }
+            )
         }
 
-        return profile
+        return await getUserById(userId)
     } catch (error) {
-        LoggerUtil.error("Error in AdminService.getUserProfile", { error: error.message })
+        LoggerUtil.error("Error in AdminService.updateUser", { error: error.message })
         if (error.statusCode) throw error
-        throw ApiErrorUtil.internalServer("Error fetching user profile")
+        throw ApiErrorUtil.internalServer("Error updating user")
+    }
+}
+
+const deleteUser = async (userId) => {
+    try {
+        const user = await UserModel.findById(userId)
+        if (!user) {
+            throw ApiErrorUtil.notFound("User not found")
+        }
+
+        await UserModel.findByIdAndDelete(userId)
+        await UserProfileModel.findOneAndDelete({ user_id: userId })
+
+        return { message: "User and associated profile deleted successfully" }
+    } catch (error) {
+        LoggerUtil.error("Error in AdminService.deleteUser", { error: error.message })
+        if (error.statusCode) throw error
+        throw ApiErrorUtil.internalServer("Error deleting user")
     }
 }
 
@@ -210,6 +300,7 @@ export const AdminService = {
     rejectProvider,
     getUsers,
     getUserById,
-    getUserProfile
+    updateUser,
+    deleteUser
 }
 

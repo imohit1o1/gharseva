@@ -18,8 +18,9 @@ const serviceCategorySchema = new Schema(
             trim: true
         },
 
-        icon: {
-            type: String
+        image: {
+            type: String,
+            required: true
         },
 
         sortOrder: {
@@ -32,9 +33,17 @@ const serviceCategorySchema = new Schema(
             default: true
         },
 
-        isVisible: {
+        isFeatured: {
             type: Boolean,
-            default: true
+            default: false
+        },
+
+        description: {
+            type: String,
+            required: true,
+            trim: true,
+            minlength: 10,
+            maxlength: 500
         }
     },
     {
@@ -42,6 +51,6 @@ const serviceCategorySchema = new Schema(
     }
 )
 
-serviceCategorySchema.index({ isActive: 1, isVisible: 1 })
+serviceCategorySchema.index({ isActive: 1, isFeatured: 1 })
 
 export const ServiceCategoryModel = mongoose.model("ServiceCategory", serviceCategorySchema)

@@ -37,9 +37,14 @@ export const getUserById = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "User fetched successfully", data)
 })
 
-export const getUserProfile = AsyncHandlerUtil(async (req, res) => {
-    const data = await AdminService.getUserProfile(req.params.userId)
-    ApiResponseUtil.send(res, StatusCodes.OK, "User profile fetched successfully", data)
+export const updateUser = AsyncHandlerUtil(async (req, res) => {
+    const data = await AdminService.updateUser(req.params.userId, req.body)
+    ApiResponseUtil.send(res, StatusCodes.OK, "User updated successfully", data)
+})
+
+export const deleteUser = AsyncHandlerUtil(async (req, res) => {
+    const data = await AdminService.deleteUser(req.params.userId)
+    ApiResponseUtil.send(res, StatusCodes.OK, "User deleted successfully", data)
 })
 
 // ===================== REVIEWS =====================
@@ -71,7 +76,8 @@ export const AdminController = {
     rejectProvider,
     getUsers,
     getUserById,
-    getUserProfile,
+    updateUser,
+    deleteUser,
     getAllReviews,
     hideReview,
     showReview,

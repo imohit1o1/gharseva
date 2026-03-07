@@ -1,7 +1,7 @@
 import { BookingModel } from "../service-booking/booking.model.js"
 import { ReviewModel } from "../review/review.model.js"
 import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
-import { BookingStatusConstants, ReviewStatusConstants } from "../../constants.js"
+import { BookingStatusConstants } from "../../constants.js"
 import mongoose from "mongoose"
 
 const getProviderAnalytics = async (providerProfileId) => {
@@ -30,7 +30,7 @@ const getProviderAnalytics = async (providerProfileId) => {
 
         // Average rating (visible reviews only)
         const ratingAgg = await ReviewModel.aggregate([
-            { $match: { service_provider_id: profileObjectId, status: ReviewStatusConstants.VISIBLE } },
+            { $match: { service_provider_id: profileObjectId, is_hidden: false } },
             { $group: { _id: null, avgRating: { $avg: "$rating" }, totalReviews: { $sum: 1 } } }
         ])
 

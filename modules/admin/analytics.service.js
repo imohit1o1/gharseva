@@ -2,6 +2,7 @@ import { BookingModel } from "../service-booking/booking.model.js"
 import { ReviewModel } from "../review/review.model.js"
 import { ServiceProviderProfileModel } from "../service-provider/service-provider-profile.model.js"
 import { UserModel } from "../user/user.model.js"
+import { ServiceCategoryModel } from "../service-category/service-category.model.js"
 import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
 import { BookingStatusConstants, RoleConstants } from "../../constants.js"
 
@@ -15,6 +16,7 @@ const getOverview = async () => {
             totalCompletedBookings,
             totalCancelledBookings,
             totalReviews,
+            totalCategories,
         ] = await Promise.all([
             UserModel.countDocuments({ role: RoleConstants.CUSTOMER }),
             ServiceProviderProfileModel.countDocuments(),
@@ -23,6 +25,7 @@ const getOverview = async () => {
             BookingModel.countDocuments({ status: BookingStatusConstants.COMPLETED }),
             BookingModel.countDocuments({ status: BookingStatusConstants.CANCELLED }),
             ReviewModel.countDocuments(),
+            ServiceCategoryModel.countDocuments(),
         ])
 
         const revenue = await BookingModel.aggregate([
@@ -38,6 +41,7 @@ const getOverview = async () => {
             totalCompletedBookings,
             totalCancelledBookings,
             totalReviews,
+            totalCategories,
             totalRevenue: revenue[0]?.total ?? 0
         }
     } catch (error) {
@@ -152,9 +156,44 @@ const getProviderAnalytics = async () => {
     }
 }
 
+const getUserAnalytics = async () => {
+    try {
+        const [total, customers, providers, admins] = await Promise.all([
+            UserModel.countDocuments(),
+            UserModel.countDocuments({ role: RoleConstants.CUSTOMER }),
+            UserModel.countDocuments({ role: RoleConstants.SERVICE_PROVIDER }),
+            UserModel.countDocuments({ role: RoleConstants.ADMIN }),
+        ])
+
+        const sixMonthsAgo = new Date()
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+        const registrationTrend = await UserModel.aggregate([
+            { $match: { createdAt: { $gte: sixMonthsAgo } } },
+            {
+                $group: {
+                    _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { "_id.year": 1, "_id.month": 1 } }
+        ])
+
+        return {
+            total,
+            byRole: { customers, providers, admins },
+            registrationTrend
+        }
+    } catch (error) {
+        LoggerUtil.error("Error in AnalyticsService.getUserAnalytics", { error: error.message })
+        throw ApiErrorUtil.internalServer("Error fetching user analytics")
+    }
+}
+
 export const AnalyticsService = {
     getOverview,
     getBookingAnalytics,
     getRevenueAnalytics,
-    getProviderAnalytics
+    getProviderAnalytics,
+    getUserAnalytics
 }

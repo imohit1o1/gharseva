@@ -78,9 +78,6 @@ const registerProvider = async (data) => {
             description
         })
 
-        user.profile_id = providerProfile._id
-        await user.save()
-
         const token = JwtUtil.generateToken({
             userId: user._id,
             role: user.role

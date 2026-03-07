@@ -15,6 +15,11 @@ export const validate = (schema, source = "body") => (req, res, next) => {
         return next(new ApiError(400, "Validation failed", errors))
     }
 
-    req[source] = result.data
+    Object.defineProperty(req, source, {
+        value: result.data,
+        writable: true,
+        enumerable: true,
+        configurable: true
+    })
     next()
 }

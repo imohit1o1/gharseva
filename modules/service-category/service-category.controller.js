@@ -24,6 +24,11 @@ export const getCategoryById = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "Category fetched successfully", data)
 })
 
+export const getCategoryBySlug = AsyncHandlerUtil(async (req, res) => {
+    const data = await CategoryService.getCategoryBySlug(req.params.slug)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Category fetched successfully", data)
+})
+
 export const updateCategory = AsyncHandlerUtil(async (req, res) => {
     const data = await CategoryService.updateCategory(req.params.id, req.body)
     ApiResponseUtil.send(res, StatusCodes.OK, "Category updated successfully", data)
@@ -39,6 +44,7 @@ export const CategoryController = {
     bulkCreateCategory,
     getAllCategories,
     getCategoryById,
+    getCategoryBySlug,
     updateCategory,
     deleteCategory
 }

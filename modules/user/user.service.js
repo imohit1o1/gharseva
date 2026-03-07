@@ -20,7 +20,6 @@ const completeProfile = async (userId, profileData) => {
         })
 
         user.isProfileComplete = true
-        user.profile_id = newProfile._id
         user.display_name = `${newProfile.first_name} ${newProfile.last_name}`
         await user.save()
 
@@ -40,8 +39,14 @@ const getMe = async (userId) => {
     try {
         const user = await UserModel.findById(userId)
             .select("-password")
-            .populate("profile_id")
             .lean()
+
+        if (!user) {
+            throw ApiErrorUtil.notFound("User not found")
+        }
+
+        const profile = await UserProfileModel.findOne({ user_id: userId }).lean()
+        user.profile = profile || null
 
         if (!user) {
             throw ApiErrorUtil.notFound("User not found")
@@ -63,12 +68,8 @@ const updateProfile = async (userId, profileData) => {
             throw ApiErrorUtil.notFound("User not found")
         }
 
-        if (!user.isProfileComplete || !user.profile_id) {
-            throw ApiErrorUtil.badRequest("Profile must be completed before updating")
-        }
-
-        const updatedProfile = await UserProfileModel.findByIdAndUpdate(
-            user.profile_id,
+        const updatedProfile = await UserProfileModel.findOneAndUpdate(
+            { user_id: userId },
             { $set: profileData },
             { new: true, runValidators: true }
         )

@@ -33,7 +33,6 @@ const completeProfile = async (userId, profileData) => {
         })
 
         user.isProfileComplete = true
-        user.profile_id = newProfile._id
         user.display_name = `${first_name} ${last_name}`
         await user.save()
 
@@ -53,19 +52,21 @@ const getMe = async (userId) => {
     try {
         const user = await UserModel.findById(userId)
             .select("-password")
-            .populate("profile_id", "-_id -user_id") // get all except id and user_id relation
             .lean()
 
         if (!user) {
             throw ApiErrorUtil.notFound("User not found")
         }
 
+        const profile = await ServiceProviderProfileModel.findOne({ user_id: userId })
+            .select("-_id -user_id")
+            .lean()
+
         LoggerUtil.info(`Provider profile fetched successfully for user ${userId}`, { userId })
 
-        const { profile_id, ...userData } = user
         return {
-            ...userData,
-            ...(profile_id || {})
+            ...user,
+            ...(profile || {})
         }
     } catch (error) {
         LoggerUtil.error("Error in ProviderService.getMe", { error: error.message })
@@ -79,10 +80,6 @@ const updateProfile = async (userId, profileData) => {
         const user = await UserModel.findById(userId)
         if (!user) {
             throw ApiErrorUtil.notFound("User not found")
-        }
-
-        if (!user.isProfileComplete || !user.profile_id) {
-            throw ApiErrorUtil.badRequest("Profile must be completed before updating")
         }
 
         const { first_name, last_name, category_id, city, area, pincode, base_price } = profileData
@@ -101,8 +98,8 @@ const updateProfile = async (userId, profileData) => {
             updateData.category_id = category_id
         }
 
-        const updatedProfile = await ServiceProviderProfileModel.findByIdAndUpdate(
-            user.profile_id,
+        const updatedProfile = await ServiceProviderProfileModel.findOneAndUpdate(
+            { user_id: userId },
             { $set: updateData },
             { new: true, runValidators: true }
         )
@@ -132,12 +129,8 @@ const toggleAvailability = async (userId, is_available) => {
             throw ApiErrorUtil.notFound("Provider not found")
         }
 
-        if (!user.isProfileComplete || !user.profile_id) {
-            throw ApiErrorUtil.badRequest("Profile must be completed before modifying availability")
-        }
-
-        const profile = await ServiceProviderProfileModel.findByIdAndUpdate(
-            user.profile_id,
+        const profile = await ServiceProviderProfileModel.findOneAndUpdate(
+            { user_id: userId },
             { $set: { is_available } },
             { new: true, runValidators: true }
         )
@@ -216,19 +209,21 @@ const getProviderById = async (providerId) => {
     try {
         const user = await UserModel.findById(providerId)
             .select("-password")
-            .populate("profile_id", "-_id -user_id") // get all except id and user_id relation
             .lean()
 
         if (!user || user.role !== RoleConstants.SERVICE_PROVIDER) {
             throw ApiErrorUtil.notFound("Provider not found")
         }
 
+        const profile = await ServiceProviderProfileModel.findOne({ user_id: providerId })
+            .select("-_id -user_id")
+            .lean()
+
         LoggerUtil.info(`Provider profile fetched successfully for user ${providerId}`)
 
-        const { profile_id, ...userData } = user
         return {
-            ...userData,
-            ...(profile_id || {})
+            ...user,
+            ...(profile || {})
         }
     } catch (error) {
         LoggerUtil.error("Error in ProviderService.getProviderById", { error: error.message })

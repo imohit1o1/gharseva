@@ -5,13 +5,18 @@ export const createCategorySchema = z.object({
     name: z
         .string({ required_error: "Category name is required" })
         .trim()
-        .min(2, "Name must be at least 2 characters")
+        .min(4, "Name must be at least 4 characters")
         .max(100, "Name must be less than 100 characters"),
-    slug: z.string().trim().lowercase().optional(),
-    icon: z.string().trim().optional(),
+    slug: z.string({ required_error: "Slug is required" }).trim().lowercase(),
+    image: z.string({ required_error: "Image is required" }).trim(),
     sortOrder: z.number().int().optional(),
     isActive: z.boolean().optional(),
-    isVisible: z.boolean().optional()
+    isFeatured: z.boolean().optional(),
+    description: z
+        .string({ required_error: "Description is required" })
+        .trim()
+        .min(10, "Description must be at least 10 characters")
+        .max(500, "Description must be less than 500 characters")
 })
 
 export const bulkCreateCategorySchema = z.object({

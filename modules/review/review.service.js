@@ -1,7 +1,7 @@
 import { ReviewModel } from "./review.model.js"
 import { BookingModel } from "../service-booking/booking.model.js"
 import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
-import { BookingStatusConstants, PagintationConstants, ReviewStatusConstants } from "../../constants.js"
+import { BookingStatusConstants, PagintationConstants } from "../../constants.js"
 
 // ===================== USER METHODS =====================
 
@@ -27,7 +27,7 @@ const createReview = async (userId, bookingId, data) => {
             service_provider_id: booking.service_provider_id,
             rating: data.rating,
             review: data.review,
-            status: ReviewStatusConstants.VISIBLE
+            is_hidden: false
         })
 
         LoggerUtil.info(`Review created by user ${userId} for booking ${bookingId}`)
@@ -80,7 +80,7 @@ const getProviderReviews = async (providerProfileId, queryFilters = {}) => {
         const skip = (parseInt(page) - 1) * parseInt(limit)
         const filter = {
             service_provider_id: providerProfileId,
-            status: ReviewStatusConstants.VISIBLE
+            is_hidden: false
         }
 
         const reviews = await ReviewModel.find(filter)
@@ -147,7 +147,7 @@ const hideReview = async (adminId, reviewId) => {
     try {
         const review = await ReviewModel.findByIdAndUpdate(
             reviewId,
-            { $set: { status: ReviewStatusConstants.HIDDEN, moderated_by: adminId } },
+            { $set: { is_hidden: true, moderated_by: adminId } },
             { new: true }
         )
 
@@ -166,7 +166,7 @@ const showReview = async (adminId, reviewId) => {
     try {
         const review = await ReviewModel.findByIdAndUpdate(
             reviewId,
-            { $set: { status: ReviewStatusConstants.VISIBLE, moderated_by: adminId } },
+            { $set: { is_hidden: false, moderated_by: adminId } },
             { new: true }
         )
 

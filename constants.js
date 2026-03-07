@@ -15,10 +15,7 @@ export const BookingStatusConstants = Object.freeze({
     REJECTED: "rejected"
 })
 
-export const ReviewStatusConstants = Object.freeze({
-    VISIBLE: "visible",
-    HIDDEN: "hidden"
-})
+
 
 
 export const PagintationConstants = Object.freeze({

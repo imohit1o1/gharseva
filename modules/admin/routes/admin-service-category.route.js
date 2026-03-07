@@ -5,6 +5,7 @@ import { CategoryValidator } from "../../service-category/service-category.valid
 
 const router = Router()
 
+router.get("/", CategoryController.getAllCategories)
 router.post("/", validate(CategoryValidator.createCategorySchema), CategoryController.createCategory)
 router.post("/bulk", validate(CategoryValidator.bulkCreateCategorySchema), CategoryController.bulkCreateCategory)
 router.put("/:id", validate(CategoryValidator.categoryIdSchema, "params"), validate(CategoryValidator.updateCategorySchema), CategoryController.updateCategory)

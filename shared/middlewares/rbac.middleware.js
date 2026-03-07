@@ -1,5 +1,4 @@
 import { ApiErrorUtil } from "../utils/index.utils.js"
-import { RoleConstants } from "../../constants.js"
 
 export const authorizeRoles = (...allowedRoles) => {
 

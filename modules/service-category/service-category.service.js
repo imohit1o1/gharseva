@@ -3,7 +3,7 @@ import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
 
 const createCategory = async (data) => {
     try {
-        const { name, icon, sortOrder, isActive, isVisible } = data
+        const { name, image, sortOrder, isActive, isFeatured, description } = data
         let { slug } = data
 
         if (!slug) {
@@ -21,10 +21,11 @@ const createCategory = async (data) => {
         }
 
         const payload = { name, slug }
-        if (icon !== undefined) payload.icon = icon
+        if (image !== undefined) payload.image = image
         if (sortOrder !== undefined) payload.sortOrder = sortOrder
         if (isActive !== undefined) payload.isActive = isActive
-        if (isVisible !== undefined) payload.isVisible = isVisible
+        if (isFeatured !== undefined) payload.isFeatured = isFeatured
+        if (description !== undefined) payload.description = description
 
         const category = await ServiceCategoryModel.create(payload)
         return category
@@ -38,7 +39,7 @@ const createCategory = async (data) => {
 const bulkCreateCategory = async (categoriesData) => {
     try {
         const payloads = categoriesData.map(data => {
-            const { name, icon, sortOrder, isActive, isVisible } = data
+            const { name, image, sortOrder, isActive, isFeatured, description } = data
             let { slug } = data
 
             if (!slug) {
@@ -46,10 +47,11 @@ const bulkCreateCategory = async (categoriesData) => {
             }
 
             const payloadItem = { name, slug }
-            if (icon !== undefined) payloadItem.icon = icon
+            if (image !== undefined) payloadItem.image = image
             if (sortOrder !== undefined) payloadItem.sortOrder = sortOrder
             if (isActive !== undefined) payloadItem.isActive = isActive
-            if (isVisible !== undefined) payloadItem.isVisible = isVisible
+            if (isFeatured !== undefined) payloadItem.isFeatured = isFeatured
+            if (description !== undefined) payloadItem.description = description
 
             return payloadItem
         })
@@ -107,9 +109,23 @@ const getCategoryById = async (categoryId) => {
     }
 }
 
+const getCategoryBySlug = async (slug) => {
+    try {
+        const category = await ServiceCategoryModel.findOne({ slug }).lean()
+        if (!category) {
+            throw ApiErrorUtil.notFound("Category not found")
+        }
+        return category
+    } catch (error) {
+        LoggerUtil.error("Error fetching category by slug", { error: error.message })
+        if (error.statusCode) throw error
+        throw ApiErrorUtil.internalServer("Failed to fetch category")
+    }
+}
+
 const updateCategory = async (categoryId, data) => {
     try {
-        const { name, slug, icon, sortOrder, isActive, isVisible } = data
+        const { name, slug, image, sortOrder, isActive, isFeatured, description } = data
 
         const category = await ServiceCategoryModel.findById(categoryId)
         if (!category) {
@@ -134,10 +150,11 @@ const updateCategory = async (categoryId, data) => {
             if (slug) category.slug = slug
         }
 
-        if (icon !== undefined) category.icon = icon
+        if (image !== undefined) category.image = image
         if (sortOrder !== undefined) category.sortOrder = sortOrder
         if (isActive !== undefined) category.isActive = isActive
-        if (isVisible !== undefined) category.isVisible = isVisible
+        if (isFeatured !== undefined) category.isFeatured = isFeatured
+        if (description !== undefined) category.description = description
 
         await category.save()
 
@@ -168,6 +185,7 @@ export const CategoryService = {
     bulkCreateCategory,
     getAllCategories,
     getCategoryById,
+    getCategoryBySlug,
     updateCategory,
     deleteCategory
 }

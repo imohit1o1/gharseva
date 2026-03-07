@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose"
-import { ReviewStatusConstants } from "../../constants.js"
 
 const reviewSchema = new Schema(
     {
@@ -30,11 +29,9 @@ const reviewSchema = new Schema(
             min: [1, "Rating must be at least 1"],
             max: [5, "Rating must be at most 5"],
         },
-        status: {
-            type: String,
-            required: true,
-            enum: Object.values(ReviewStatusConstants),
-            default: ReviewStatusConstants.VISIBLE
+        is_hidden: {
+            type: Boolean,
+            default: false
         },
         moderated_by: {
             type: Schema.Types.ObjectId,
