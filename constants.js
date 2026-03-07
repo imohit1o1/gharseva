@@ -5,6 +5,7 @@ export const RoleConstants = Object.freeze({
 })
 
 export const BookingStatusConstants = Object.freeze({
+    CREATED: "created",
     REQUESTED: "requested",
     CONFIRMED: "confirmed",
     IN_PROGRESS: "in_progress",

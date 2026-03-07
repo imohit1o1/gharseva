@@ -28,6 +28,7 @@ const createBooking = async (userId, data) => {
         if (!providerProfile) {
             throw ApiErrorUtil.notFound("Service provider not found")
         }
+        console.log("providerProfile", providerProfile)
         if (!providerProfile.is_approved) {
             throw ApiErrorUtil.badRequest("Service provider is not approved")
         }
@@ -41,10 +42,10 @@ const createBooking = async (userId, data) => {
             schedule_at,
             address,
             price: providerProfile.base_price,
-            status: BookingStatusConstants.PENDING
+            status: BookingStatusConstants.REQUESTED
         })
-
-        await recordHistory(booking._id, null, BookingStatusConstants.PENDING, userId, "Booking created")
+        console.log("booking data", booking)
+        await recordHistory(booking._id, BookingStatusConstants.CREATED, BookingStatusConstants.REQUESTED, userId, "Booking requested")
 
         if (note) {
             await BookingNoteModel.create({ booking_id: booking._id, user_id: userId, note })

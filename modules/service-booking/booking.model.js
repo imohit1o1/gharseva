@@ -31,11 +31,6 @@ const bookingSchema = new Schema(
             required: true,
             index: true
         },
-        user_profile_id: {
-            type: Schema.Types.ObjectId,
-            ref: "UserProfile",
-            required: true
-        },
         service_provider_id: {
             type: Schema.Types.ObjectId,
             ref: "ServiceProviderProfile",
