@@ -9,6 +9,66 @@ import { ProviderAnalyticsController } from "./provider-analytics.controller.js"
 
 const router = Router()
 
+// Authenticated users can fetch their own profile details (SERVICE_PROVIDER only)
+router.get("/profile",
+    authenticate,
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    ProviderController.getMe
+)
+
+// complete onboarding profile (SERVICE_PROVIDER only)
+router.post("/profile",
+    authenticate,
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    validate(ProviderValidator.completeProfileSchema),
+    ProviderController.completeProfile
+)
+
+// update profile details (approved service provider only)
+router.put("/profile",
+    authenticate,
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    validate(ProviderValidator.updateProfileSchema),
+    ProviderController.updateProfile
+)
+
+// toggle provider availability (approved service provider only)
+router.patch("/profile/availability",
+    authenticate,
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    validate(ProviderValidator.toggleAvailabilitySchema),
+    ProviderController.toggleAvailability
+)
+
+
+// Provider booking routes
+router.use("/bookings",
+    authenticate,
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    ProviderBookingRouter)
+
+// Provider review routes
+router.use("/reviews",
+    authenticate,
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    ProviderReviewRouter)
+
+// Provider analytics (requireApproval attaches profileId)
+router.get("/analytics",
+    authenticate,
+    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
+    requireApproval,
+    ProviderAnalyticsController.getProviderAnalytics
+)
+
+
+
 // fetch list of providers (customer only)
 router.get("/list",
     validate(ProviderValidator.getAllProvidersSchema, "query"),
@@ -20,53 +80,5 @@ router.get("/:id",
     validate(ProviderValidator.getProviderByIdSchema, "params"),
     ProviderController.getProviderById
 )
-
-// Authenticated users only
-router.use(authenticate)
-
-// Authenticated users can fetch their own profile details (SERVICE_PROVIDER only)
-router.get("/profile",
-    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
-    ProviderController.getMe
-)
-
-// complete onboarding profile (SERVICE_PROVIDER only)
-router.post("/profile",
-    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
-    validate(ProviderValidator.completeProfileSchema),
-    ProviderController.completeProfile
-)
-
-// update profile details (approved service provider only)
-router.put("/profile",
-    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
-    requireApproval,
-    validate(ProviderValidator.updateProfileSchema),
-    ProviderController.updateProfile
-)
-
-// toggle provider availability (approved service provider only)
-router.patch("/profile/availability",
-    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
-    requireApproval,
-    validate(ProviderValidator.toggleAvailabilitySchema),
-    ProviderController.toggleAvailability
-)
-
-
-// Provider booking routes
-router.use("/bookings", ProviderBookingRouter)
-
-// Provider review routes
-router.use("/reviews", ProviderReviewRouter)
-
-// Provider analytics (requireApproval attaches profileId)
-router.get("/analytics",
-    authorizeRoles(RoleConstants.SERVICE_PROVIDER),
-    requireApproval,
-    ProviderAnalyticsController.getProviderAnalytics
-)
-
-
 
 export { router as ProviderRouter }

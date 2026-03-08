@@ -265,14 +265,19 @@ const rejectBooking = async (providerProfileId, providerId, bookingId, cancel_re
     }
 }
 
-const startBooking = async (providerProfileId, providerId, bookingId) => {
+const startBooking = async (providerProfileId, providerId, bookingId, before_image) => {
     try {
         const booking = await BookingModel.findOne({ _id: bookingId, service_provider_id: providerProfileId })
         if (!booking) throw ApiErrorUtil.notFound("Booking not found")
 
         assertStatus(booking, [BookingStatusConstants.CONFIRMED], "Only confirmed bookings can be started")
 
+        if (!before_image) {
+            throw ApiErrorUtil.badRequest("Before image is required to start the job")
+        }
+
         booking.status = BookingStatusConstants.IN_PROGRESS
+        booking.before_image = before_image
         await booking.save()
 
         await recordHistory(bookingId, BookingStatusConstants.CONFIRMED, BookingStatusConstants.IN_PROGRESS, providerId)
@@ -284,14 +289,19 @@ const startBooking = async (providerProfileId, providerId, bookingId) => {
     }
 }
 
-const completeBooking = async (providerProfileId, providerId, bookingId) => {
+const completeBooking = async (providerProfileId, providerId, bookingId, after_image) => {
     try {
         const booking = await BookingModel.findOne({ _id: bookingId, service_provider_id: providerProfileId })
         if (!booking) throw ApiErrorUtil.notFound("Booking not found")
 
         assertStatus(booking, [BookingStatusConstants.IN_PROGRESS], "Only in-progress bookings can be completed")
 
+        if (!after_image) {
+            throw ApiErrorUtil.badRequest("After image is required to complete the job")
+        }
+
         booking.status = BookingStatusConstants.COMPLETED
+        booking.after_image = after_image
         await booking.save()
 
         await recordHistory(bookingId, BookingStatusConstants.IN_PROGRESS, BookingStatusConstants.COMPLETED, providerId)

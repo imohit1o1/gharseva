@@ -61,12 +61,12 @@ export const rejectBooking = AsyncHandlerUtil(async (req, res) => {
 })
 
 export const startBooking = AsyncHandlerUtil(async (req, res) => {
-    const data = await BookingService.startBooking(req.user.profileId, req.user.userId, req.params.bookingId)
+    const data = await BookingService.startBooking(req.user.profileId, req.user.userId, req.params.bookingId, req.body.before_image)
     ApiResponseUtil.send(res, StatusCodes.OK, "Booking started successfully", data)
 })
 
 export const completeBooking = AsyncHandlerUtil(async (req, res) => {
-    const data = await BookingService.completeBooking(req.user.profileId, req.user.userId, req.params.bookingId)
+    const data = await BookingService.completeBooking(req.user.profileId, req.user.userId, req.params.bookingId, req.body.after_image)
     ApiResponseUtil.send(res, StatusCodes.OK, "Booking completed successfully", data)
 })
 

@@ -30,10 +30,12 @@ router.patch("/:bookingId/reject",
 
 router.patch("/:bookingId/in-progress",
     validate(BookingValidator.bookingIdSchema, "params"),
+    validate(BookingValidator.startBookingSchema),
     ProviderBookingController.startBooking
 )
 router.patch("/:bookingId/complete",
     validate(BookingValidator.bookingIdSchema, "params"),
+    validate(BookingValidator.completeBookingSchema),
     ProviderBookingController.completeBooking
 )
 router.patch("/:bookingId/cancel",

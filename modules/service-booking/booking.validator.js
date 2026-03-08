@@ -54,6 +54,18 @@ export const bookingIdSchema = z.object({
     bookingId: objectIdSchema("Booking ID")
 })
 
+export const startBookingSchema = z.object({
+    before_image: z
+        .string({ required_error: "Before image is required" })
+        .url({ message: "Invalid before image URL" })
+})
+
+export const completeBookingSchema = z.object({
+    after_image: z
+        .string({ required_error: "After image is required" })
+        .url({ message: "Invalid after image URL" })
+})
+
 export const listBookingsSchema = z.object({
     page: z.string().optional().transform(val => (val ? parseInt(val) : 1)),
     limit: z.string().optional().transform(val => (val ? parseInt(val) : 10)),
@@ -65,5 +77,7 @@ export const BookingValidator = {
     cancelBookingSchema,
     rescheduleBookingSchema,
     bookingIdSchema,
+    startBookingSchema,
+    completeBookingSchema,
     listBookingsSchema
 }

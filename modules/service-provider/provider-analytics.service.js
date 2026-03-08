@@ -11,15 +11,23 @@ const getProviderAnalytics = async (providerProfileId) => {
         const [
             totalBookings,
             completedBookings,
-            cancelledBookings,
             pendingBookings,
-            activeBookings
+            inProgressBookings,
+            cancelledBookings,
+            rejectedBookings
         ] = await Promise.all([
             BookingModel.countDocuments({ service_provider_id: profileObjectId }),
             BookingModel.countDocuments({ service_provider_id: profileObjectId, status: BookingStatusConstants.COMPLETED }),
+            BookingModel.countDocuments({
+                service_provider_id: profileObjectId,
+                status: { $in: [BookingStatusConstants.CREATED, BookingStatusConstants.REQUESTED] }
+            }),
+            BookingModel.countDocuments({
+                service_provider_id: profileObjectId,
+                status: { $in: [BookingStatusConstants.CONFIRMED, BookingStatusConstants.ACCEPTED, BookingStatusConstants.IN_PROGRESS] }
+            }),
             BookingModel.countDocuments({ service_provider_id: profileObjectId, status: BookingStatusConstants.CANCELLED }),
-            BookingModel.countDocuments({ service_provider_id: profileObjectId, status: BookingStatusConstants.PENDING }),
-            BookingModel.countDocuments({ service_provider_id: profileObjectId, status: BookingStatusConstants.IN_PROGRESS })
+            BookingModel.countDocuments({ service_provider_id: profileObjectId, status: BookingStatusConstants.REJECTED })
         ])
 
         // Total revenue from completed bookings
@@ -59,9 +67,10 @@ const getProviderAnalytics = async (providerProfileId) => {
         return {
             totalBookings,
             completedBookings,
-            cancelledBookings,
             pendingBookings,
-            activeBookings,
+            inProgressBookings,
+            cancelledBookings,
+            rejectedBookings,
             totalRevenue: revenueAgg[0]?.totalRevenue ?? 0,
             averageRating: ratingAgg[0]?.avgRating ? parseFloat(ratingAgg[0].avgRating.toFixed(2)) : null,
             totalReviews: ratingAgg[0]?.totalReviews ?? 0,
