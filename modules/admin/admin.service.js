@@ -110,7 +110,7 @@ const updateProvider = async (providerProfileId, updateData) => {
 
         await profile.save()
 
-        return await getProviderById(providerProfileId)
+        return await ProviderService.getProviderById(providerProfileId)
     } catch (error) {
         LoggerUtil.error("Error in AdminService.updateProvider", { error: error.message })
         if (error.statusCode) throw error

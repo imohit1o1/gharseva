@@ -1,6 +1,7 @@
 import { UserModel } from "../user/user.model.js"
 import { ServiceProviderProfileModel } from "./service-provider-profile.model.js"
 import { ServiceCategoryModel } from "../service-category/index.service-category.js"
+import { ProviderAnalyticsService } from "./provider-analytics.service.js"
 import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
 import { RoleConstants, PagintationConstants } from "../../constants.js"
 import mongoose from "mongoose"
@@ -263,73 +264,28 @@ const getAllProviders = async (queryFilters = {}) => {
 
 const getProviderById = async (providerId) => {
     try {
-        const user = await UserModel.aggregate([
-            {
-                $match: {
-                    _id: new mongoose.Types.ObjectId(providerId),
-                    role: RoleConstants.SERVICE_PROVIDER
-                }
-            },
-            {
-                $lookup: {
-                    from: "serviceproviderprofiles",
-                    localField: "_id",
-                    foreignField: "user_id",
-                    as: "profile"
-                }
-            },
-            {
-                $unwind: {
-                    path: "$profile",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $replaceRoot: {
-                    newRoot: {
-                        $mergeObjects: [{ $ifNull: ["$profile", {}] }, "$$ROOT"]
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: "servicecategories",
-                    localField: "category_id",
-                    foreignField: "_id",
-                    as: "category"
-                }
-            },
-            {
-                $unwind: {
-                    path: "$category",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $project: {
-                    password: 0,
-                    profile: 0,
-                    user_id: 0,
-                    __v: 0
-                }
-            }
-        ]);
+        const provider = await ServiceProviderProfileModel.findById(providerId)
+            .populate("user_id", "display_name email isProfileComplete")
+            .populate("category_id", "name slug")
+            .populate("approved_by", "display_name email")
+            .lean()
 
-        if (!user || user.length === 0) {
+        if (!provider) {
             throw ApiErrorUtil.notFound("Provider not found")
         }
 
-        LoggerUtil.info(`Provider profile fetched successfully for user ${providerId}`)
+        const analytics = await ProviderAnalyticsService.getProviderAnalytics(providerId)
+        provider.analytics = analytics
 
-        return user[0]
+        LoggerUtil.info(`Provider profile fetched successfully for provider ID ${providerId}`)
+
+        return provider
     } catch (error) {
         LoggerUtil.error("Error in ProviderService.getProviderById", { error: error.message })
         if (error.statusCode) throw error
         throw ApiErrorUtil.internalServer("Error fetching provider profile")
     }
 }
-
-
 
 
 export const ProviderService = {

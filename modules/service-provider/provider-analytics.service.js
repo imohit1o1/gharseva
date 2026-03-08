@@ -39,7 +39,13 @@ const getProviderAnalytics = async (providerProfileId) => {
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
         const bookingsByMonth = await BookingModel.aggregate([
-            { $match: { service_provider_id: profileObjectId, createdAt: { $gte: sixMonthsAgo } } },
+            {
+                $match: {
+                    service_provider_id: profileObjectId,
+                    createdAt: { $gte: sixMonthsAgo },
+                    status: BookingStatusConstants.COMPLETED
+                }
+            },
             {
                 $group: {
                     _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
