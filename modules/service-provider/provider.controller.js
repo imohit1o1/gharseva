@@ -42,7 +42,7 @@ export const getAllProvidersInternal = AsyncHandlerUtil(async (req, res) => {
 })
 
 export const getProviderById = AsyncHandlerUtil(async (req, res) => {
-    const data = await ProviderService.getProviderById(req.params.id)
+    const data = await ProviderService.getProviderById(req.params.providerId)
 
     // Only approved providers are visible on the marketplace for customers, providers, and guest users.
     const isRestrictedRole = !req.user || req.user.role !== RoleConstants.ADMIN
