@@ -6,10 +6,11 @@ import { RoleConstants } from "../../constants.js"
 import { ProviderBookingRouter } from "../service-booking/index.booking.js"
 import { ProviderReviewRouter } from "../review/index.review.js"
 import { ProviderAnalyticsController } from "./provider-analytics.controller.js"
+import { LoggerUtil } from "../../shared/utils/index.utils.js"
 
 const router = Router()
 
-console.log("[provider.route.js] ✅ Router loaded and initialized")
+LoggerUtil.info("[provider.route.js] ✅ Router loaded and initialized")
 
 // Authenticated users can fetch their own profile details (SERVICE_PROVIDER only)
 router.get("/profile",
@@ -74,7 +75,7 @@ router.get("/analytics",
 // fetch list of providers (customer only)
 router.get("/list",
     (req, res, next) => {
-        console.log("[provider.route.js] ✅ HIT /list route - query:", req.query)
+        LoggerUtil.info(`[provider.route.js] ✅ HIT /list route - query: ${JSON.stringify(req.query)}`)
         next()
     },
     validate(ProviderValidator.getAllProvidersSchema, "query"),
