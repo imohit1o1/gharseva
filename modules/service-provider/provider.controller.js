@@ -35,9 +35,11 @@ export const getAllProviders = AsyncHandlerUtil(async (req, res) => {
 })
 
 // Internal method - used by admin controller (returns ALL providers including unapproved)
-async function getAllProvidersInternal(queryFilters = {}) {
-    return await ProviderService.getAllProvidersForAdmin(queryFilters)
-}
+// Note: Express passes (req, res, next) but we only need query
+export const getAllProvidersInternal = AsyncHandlerUtil(async (req, res) => {
+    const data = await ProviderService.getAllProvidersForAdmin(req.query)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Admin providers list fetched successfully", data)
+})
 
 export const getProviderById = AsyncHandlerUtil(async (req, res) => {
     const data = await ProviderService.getProviderById(req.params.id)

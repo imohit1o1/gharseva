@@ -325,7 +325,7 @@ const getAllProvidersForAdmin = async (queryFilters = {}) => {
 
         const total = await ServiceProviderProfileModel.countDocuments(filter)
 
-        LoggerUtil.info("Admin providers list fetched successfully", { count: profiles.length })
+        console.log("[Admin] Providers list fetched successfully", { count: profiles.length, filters: queryFilters, data: profiles })
 
         return {
             providers: profiles,
