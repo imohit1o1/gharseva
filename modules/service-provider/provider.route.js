@@ -9,6 +9,8 @@ import { ProviderAnalyticsController } from "./provider-analytics.controller.js"
 
 const router = Router()
 
+console.log("[provider.route.js] ✅ Router loaded and initialized")
+
 // Authenticated users can fetch their own profile details (SERVICE_PROVIDER only)
 router.get("/profile",
     authenticate,
@@ -71,6 +73,10 @@ router.get("/analytics",
 
 // fetch list of providers (customer only)
 router.get("/list",
+    (req, res, next) => {
+        console.log("[provider.route.js] ✅ HIT /list route - query:", req.query)
+        next()
+    },
     validate(ProviderValidator.getAllProvidersSchema, "query"),
     ProviderController.getAllProviders
 )
