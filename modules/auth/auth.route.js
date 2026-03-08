@@ -25,4 +25,9 @@ router.post("/refresh-token",
     AuthController.refreshToken
 )
 
+router.post("/logout",
+    authenticate,
+    AuthController.logout
+)
+
 export { router as AuthRouter }

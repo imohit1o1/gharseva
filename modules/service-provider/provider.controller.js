@@ -34,6 +34,11 @@ export const getAllProviders = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "Service providers list fetched successfully", data)
 })
 
+// Internal method - used by admin controller
+async function getAllProvidersInternal(queryFilters = {}) {
+    return await ProviderService.getAllProviders(queryFilters)
+}
+
 export const getProviderById = AsyncHandlerUtil(async (req, res) => {
     const data = await ProviderService.getProviderById(req.params.id)
 
@@ -52,5 +57,6 @@ export const ProviderController = {
     updateProfile,
     toggleAvailability,
     getAllProviders,
-    getProviderById
+    getProviderById,
+    getAllProvidersInternal
 }

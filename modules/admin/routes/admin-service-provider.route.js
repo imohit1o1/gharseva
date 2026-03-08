@@ -6,7 +6,7 @@ import { ProviderController } from "../../service-provider/provider.controller.j
 
 const router = Router()
 
-router.get("/", validate(AdminValidator.listProvidersQuerySchema, "query"), ProviderController.getAllProviders)
+router.get("/", validate(AdminValidator.listProvidersQuerySchema, "query"), ProviderController.getAllProvidersInternal)
 router.get("/:id", validate(AdminValidator.providerIdSchema, "params"), ProviderController.getProviderById)
 
 router.put("/:providerId/approve", validate(AdminValidator.providerIdSchema, "params"), AdminController.approveProvider)

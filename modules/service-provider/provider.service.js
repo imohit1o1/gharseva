@@ -229,7 +229,7 @@ const getAllProviders = async (queryFilters = {}) => {
             filter.category_id = category._id
         }
 
-        if (is_approved !== undefined) filter.is_approved = is_approved === "true" || is_approved === true
+        // Public endpoint - no approval filtering
         if (is_available !== undefined) filter.is_available = is_available === "true" || is_available === true
         if (is_featured !== undefined) filter.is_featured = is_featured === "true" || is_featured === true
 

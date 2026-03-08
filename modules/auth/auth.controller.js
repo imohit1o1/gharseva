@@ -22,10 +22,17 @@ export const refreshToken = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "Token refreshed successfully", data)
 })
 
+export const logout = AsyncHandlerUtil(async (req, res) => {
+    const token = req.headers.authorization?.split(" ")[1]
+    await AuthService.logout(token)
+    ApiResponseUtil.send(res, StatusCodes.OK, "Logged out successfully")
+})
+
 
 export const AuthController = {
     register,
     registerProvider,
     login,
-    refreshToken
+    refreshToken,
+    logout
 }
