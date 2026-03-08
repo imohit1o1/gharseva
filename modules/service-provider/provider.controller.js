@@ -45,7 +45,7 @@ export const getProviderById = AsyncHandlerUtil(async (req, res) => {
     // Only approved providers are visible on the marketplace for customers, providers, and guest users.
     const isRestrictedRole = !req.user || req.user.role !== RoleConstants.ADMIN
     if (isRestrictedRole && !data.is_approved) {
-        throw ApiErrorUtil.notFound("Provider not found")
+        throw ApiErrorUtil.notFound("Provider is not available or not approved")
     }
 
     ApiResponseUtil.send(res, StatusCodes.OK, "Provider profile fetched successfully", data)
