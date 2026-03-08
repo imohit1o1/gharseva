@@ -34,9 +34,9 @@ export const getAllProviders = AsyncHandlerUtil(async (req, res) => {
     ApiResponseUtil.send(res, StatusCodes.OK, "Service providers list fetched successfully", data)
 })
 
-// Internal method - used by admin controller
+// Internal method - used by admin controller (returns ALL providers including unapproved)
 async function getAllProvidersInternal(queryFilters = {}) {
-    return await ProviderService.getAllProviders(queryFilters)
+    return await ProviderService.getAllProvidersForAdmin(queryFilters)
 }
 
 export const getProviderById = AsyncHandlerUtil(async (req, res) => {
