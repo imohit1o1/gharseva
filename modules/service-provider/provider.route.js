@@ -9,6 +9,18 @@ import { ProviderAnalyticsController } from "./provider-analytics.controller.js"
 
 const router = Router()
 
+// fetch list of providers (customer only)
+router.get("/list",
+    validate(ProviderValidator.getAllProvidersSchema, "query"),
+    ProviderController.getAllProviders
+)
+
+// fetch any provider profile (customer only)
+router.get("/:id",
+    validate(ProviderValidator.getProviderByIdSchema, "params"),
+    ProviderController.getProviderById
+)
+
 // Authenticated users only
 router.use(authenticate)
 
@@ -57,18 +69,4 @@ router.get("/analytics",
 
 
 
-
-// fetch list of providers (customer only)
-router.get("/",
-    authorizeRoles(RoleConstants.CUSTOMER),
-    validate(ProviderValidator.getAllProvidersSchema, "query"),
-    ProviderController.getAllProviders
-)
-
-// fetch any provider profile (customer only)
-router.get("/:id",
-    authorizeRoles(RoleConstants.CUSTOMER),
-    validate(ProviderValidator.getProviderByIdSchema, "params"),
-    ProviderController.getProviderById
-)
 export { router as ProviderRouter }

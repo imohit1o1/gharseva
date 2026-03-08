@@ -25,8 +25,8 @@ export const toggleAvailability = AsyncHandlerUtil(async (req, res) => {
 
 
 export const getAllProviders = AsyncHandlerUtil(async (req, res) => {
-    // Only approved providers are visible to customers.
-    if (req.user.role === RoleConstants.CUSTOMER) {
+    // Only approved providers are visible on the marketplace for customers, providers, and guest users.
+    if (!req.user || req.user.role !== RoleConstants.ADMIN) {
         req.query.is_approved = true
     }
 
@@ -37,8 +37,9 @@ export const getAllProviders = AsyncHandlerUtil(async (req, res) => {
 export const getProviderById = AsyncHandlerUtil(async (req, res) => {
     const data = await ProviderService.getProviderById(req.params.id)
 
-    // Only approved providers are visible to customers.
-    if (req.user.role === RoleConstants.CUSTOMER && !data.is_approved) {
+    // Only approved providers are visible on the marketplace for customers, providers, and guest users.
+    const isRestrictedRole = !req.user || req.user.role !== RoleConstants.ADMIN
+    if (isRestrictedRole && !data.is_approved) {
         throw ApiErrorUtil.notFound("Provider not found")
     }
 

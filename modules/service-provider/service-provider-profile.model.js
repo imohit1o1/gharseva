@@ -19,12 +19,14 @@ const serviceProviderProfileSchema = new Schema(
             required: true,
             trim: true,
             maxlength: [100, "City must be less than 100 characters long"],
+            index: true
         },
         area: {
             type: String,
             required: true,
             trim: true,
             maxlength: [100, "Area must be less than 100 characters long"],
+            index: true
         },
         pincode: {
             type: String,
@@ -32,6 +34,7 @@ const serviceProviderProfileSchema = new Schema(
             trim: true,
             minlength: [4, "Pincode must be at least 4 characters long"],
             maxlength: [10, "Pincode must be less than 10 characters long"],
+            index: true
         },
         base_price: {
             type: Number,

@@ -4,69 +4,11 @@ import { ServiceProviderProfileModel } from "../service-provider/service-provide
 import { ApiErrorUtil, LoggerUtil } from "../../shared/utils/index.utils.js"
 import { PagintationConstants, RoleConstants } from "../../constants.js"
 
+import { ProviderService } from "../service-provider/provider.service.js"
+
 // ===================== SERVICE PROVIDER MANAGEMENT =====================
 
-const getProviders = async (queryFilters = {}) => {
-    try {
-        const {
-            page = PagintationConstants.PAGE,
-            limit = PagintationConstants.LIMIT,
-            city,
-            area,
-            is_approved
-        } = queryFilters
-
-        const skip = (parseInt(page) - 1) * parseInt(limit)
-        const filter = {}
-        if (city) filter.city = new RegExp(city, "i")
-        if (area) filter.area = new RegExp(area, "i")
-        if (is_approved !== undefined) filter.is_approved = is_approved
-
-        const providers = await ServiceProviderProfileModel.find(filter)
-            .populate("user_id", "display_name email")
-            .populate("category_id", "name slug")
-            .populate("approved_by", "display_name email")
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(parseInt(limit))
-            .lean()
-
-        const total = await ServiceProviderProfileModel.countDocuments(filter)
-
-        return {
-            providers,
-            pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total,
-                total_pages: Math.ceil(total / parseInt(limit))
-            }
-        }
-    } catch (error) {
-        LoggerUtil.error("Error in AdminService.getProviders", { error: error.message })
-        throw ApiErrorUtil.internalServer("Error fetching service providers")
-    }
-}
-
-const getProviderById = async (providerId) => {
-    try {
-        const provider = await ServiceProviderProfileModel.findById(providerId)
-            .populate("user_id", "display_name email")
-            .populate("category_id", "name slug")
-            .populate("approved_by", "display_name email")
-            .lean()
-
-        if (!provider) {
-            throw ApiErrorUtil.notFound("Service provider not found")
-        }
-
-        return provider
-    } catch (error) {
-        LoggerUtil.error("Error in AdminService.getProviderById", { error: error.message })
-        if (error.statusCode) throw error
-        throw ApiErrorUtil.internalServer("Error fetching service provider")
-    }
-}
+// ===================== SERVICE PROVIDER MANAGEMENT =====================
 
 const approveProvider = async (adminId, providerId) => {
     try {
@@ -370,8 +312,6 @@ const deleteUser = async (userId) => {
 }
 
 export const AdminService = {
-    getProviders,
-    getProviderById,
     approveProvider,
     rejectProvider,
     updateProvider,

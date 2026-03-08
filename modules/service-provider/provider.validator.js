@@ -60,11 +60,9 @@ export const updateProfileSchema = completeProfileSchema.partial()
 export const getAllProvidersSchema = z.object({
     page: z.string().optional().transform(val => (val ? parseInt(val) : 1)),
     limit: z.string().optional().transform(val => (val ? parseInt(val) : 10)),
-    city: z.string().trim().optional(),
-    area: z.string().trim().optional(),
-    category_id: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), "Invalid Category ID format").optional(),
-    is_approved: z.enum(["true", "false", ""]).optional(),
-    is_available: z.enum(["true", "false", ""]).optional()
+    search: z.string().trim().optional(),
+    category_slug: z.string().trim().optional(),
+    is_available: z.enum(["true", "false", ""]).optional(),
 })
 
 export const getProviderByIdSchema = z.object({

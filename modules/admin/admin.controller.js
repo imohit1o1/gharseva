@@ -5,15 +5,7 @@ import { AsyncHandlerUtil, ApiResponseUtil } from "../../shared/utils/index.util
 
 // ===================== SERVICE PROVIDERS =====================
 
-export const getProviders = AsyncHandlerUtil(async (req, res) => {
-    const data = await AdminService.getProviders(req.query)
-    ApiResponseUtil.send(res, StatusCodes.OK, "Service providers fetched successfully", data)
-})
-
-export const getProviderById = AsyncHandlerUtil(async (req, res) => {
-    const data = await AdminService.getProviderById(req.params.providerId)
-    ApiResponseUtil.send(res, StatusCodes.OK, "Service provider fetched successfully", data)
-})
+// ===================== SERVICE PROVIDERS =====================
 
 export const approveProvider = AsyncHandlerUtil(async (req, res) => {
     const data = await AdminService.approveProvider(req.user.userId, req.params.providerId)
@@ -80,8 +72,6 @@ export const deleteReview = AsyncHandlerUtil(async (req, res) => {
 })
 
 export const AdminController = {
-    getProviders,
-    getProviderById,
     approveProvider,
     rejectProvider,
     updateProvider,

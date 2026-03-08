@@ -193,43 +193,60 @@ const getAllProviders = async (queryFilters = {}) => {
         const {
             page = PagintationConstants.PAGE,
             limit = PagintationConstants.LIMIT,
-            city,
-            area,
-            category_id,
+            search,
+            category_slug,
             is_approved,
-            is_available
+            is_available,
+            is_featured
         } = queryFilters
 
         const skip = (parseInt(page) - 1) * parseInt(limit)
 
         const filter = {}
-        if (city) filter.city = new RegExp(city, "i")
-        if (area) filter.area = new RegExp(area, "i")
-        if (category_id) filter.category_id = category_id
+        if (search) {
+            const searchRegex = new RegExp(search, "i")
+            filter.$or = [
+                { city: searchRegex },
+                { area: searchRegex },
+                { pincode: searchRegex }
+            ]
+        }
+
+        if (category_slug) {
+            const category = await ServiceCategoryModel.findOne({ slug: category_slug, isActive: true })
+            if (!category) {
+                return {
+                    providers: [],
+                    pagination: {
+                        page: parseInt(page),
+                        limit: parseInt(limit),
+                        total: 0,
+                        total_pages: 0
+                    }
+                }
+            }
+            filter.category_id = category._id
+        }
+
         if (is_approved !== undefined) filter.is_approved = is_approved === "true" || is_approved === true
         if (is_available !== undefined) filter.is_available = is_available === "true" || is_available === true
+        if (is_featured !== undefined) filter.is_featured = is_featured === "true" || is_featured === true
 
         const profiles = await ServiceProviderProfileModel.find(filter)
-            .populate("user_id", "email role display_name isProfileComplete createdAt updatedAt")
-            .populate("category_id", "name")
+            .populate("user_id", "display_name email isProfileComplete")
+            .populate("category_id", "name slug")
+            .populate("approved_by", "display_name email")
+            .sort({ createdAt: -1 })
             .skip(skip)
             .limit(parseInt(limit))
             .lean()
 
         const total = await ServiceProviderProfileModel.countDocuments(filter)
 
-        const formattedProviders = profiles.map(profile => {
-            const { user_id, ...profileData } = profile
-            return {
-                ...(user_id || {}),
-                ...profileData,
-            }
-        })
-
-        LoggerUtil.info("Providers list fetched successfully", { count: formattedProviders.length })
+        LoggerUtil.info("Providers list fetched successfully", { count: profiles.length })
 
         return {
-            providers: formattedProviders,
+            providers: profiles,
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),
